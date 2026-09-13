@@ -4,7 +4,7 @@ public class ServerProfile
 {
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
-    public string Name { get; set; } = "Мой сервер";
+    public string Name { get; set; } = "My server";
 
     public string Host { get; set; } = string.Empty;
 

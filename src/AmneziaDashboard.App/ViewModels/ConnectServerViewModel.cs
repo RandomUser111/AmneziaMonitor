@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using AmneziaDashboard.Core.Models;
+using AmneziaDashboard.App.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AmneziaDashboard.App.ViewModels;
@@ -10,7 +11,7 @@ namespace AmneziaDashboard.App.ViewModels;
 public partial class ConnectServerViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string _name = "Мой сервер";
+    private string _name = LocalizationService.T("My server", "Мой сервер");
 
     [ObservableProperty]
     private string _host = string.Empty;
@@ -46,7 +47,7 @@ public partial class ConnectServerViewModel : ViewModelBase
     private bool _secureStorageAvailable;
 
     [ObservableProperty]
-    private string _secureStorageText = "Защищённое хранилище недоступно";
+    private string _secureStorageText = LocalizationService.T("Secure storage is unavailable", "Защищённое хранилище недоступно");
 
     [ObservableProperty]
     private bool _hasSavedProfiles;
@@ -58,13 +59,13 @@ public partial class ConnectServerViewModel : ViewModelBase
     private bool _showSaveProfileOption = true;
 
     [ObservableProperty]
-    private string _headerText = "Подключить сервер";
+    private string _headerText = LocalizationService.T("Connect server", "Подключить сервер");
 
     [ObservableProperty]
-    private string _descriptionText = "Введите данные SSH или выберите сохранённый сервер.";
+    private string _descriptionText = LocalizationService.T("Enter SSH details or choose a saved server.", "Введите данные SSH или выберите сохранённый сервер.");
 
     [ObservableProperty]
-    private string _primaryButtonText = "Подключиться";
+    private string _primaryButtonText = LocalizationService.T("Connect", "Подключиться");
 
     public ObservableCollection<ServerProfile> SavedProfiles { get; } = [];
 
@@ -74,8 +75,8 @@ public partial class ConnectServerViewModel : ViewModelBase
     {
         SecureStorageAvailable = available;
         SecureStorageText = available
-            ? $"Пароль будет сохранён в {backendName}."
-            : "Защищённое хранилище недоступно; пароль сохраняться не будет.";
+            ? LocalizationService.T($"The password will be saved in {backendName}.", $"Пароль будет сохранён в {backendName}.")
+            : LocalizationService.T("Secure storage is unavailable; the password will not be saved.", "Защищённое хранилище недоступно; пароль сохраняться не будет.");
 
         if (!available)
         {

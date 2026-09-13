@@ -1,6 +1,7 @@
 param(
-    [string]$Version = "1.0.2",
-    [switch]$Standalone
+    [string]$Version = "1.4.0",
+    [switch]$Standalone,
+    [switch]$BuildWindowsInstaller
 )
 
 $ErrorActionPreference = "Stop"
@@ -108,6 +109,10 @@ foreach ($rid in $Rids) {
         throw "Publish directory is empty for ${rid}: $out"
     }
 
+    if ($rid.StartsWith("win-")) {
+        & (Join-Path $PSScriptRoot "sign-windows.ps1") -Files (Join-Path $out "AmneziaMonitor.exe")
+    }
+
     Write-PackageInfo -Directory $out -Rid $rid -IsStandalone $Standalone.IsPresent
     Copy-Item (Join-Path $Root "LICENSE") (Join-Path $out "LICENSE") -Force
     Copy-Item (Join-Path $Root "THIRD_PARTY_NOTICES.md") (Join-Path $out "THIRD_PARTY_NOTICES.md") -Force
@@ -136,4 +141,29 @@ Get-ChildItem $Dist | Select-Object Name, @{N='SizeMB'; E={[math]::Round($_.Leng
 
 if (-not $Standalone) {
     Write-Host "Tip: use -Standalone only if you need packages that include the .NET runtime." -ForegroundColor DarkGray
+}
+
+if ($BuildWindowsInstaller) {
+    if ($Standalone) {
+        throw "The Windows installer is currently generated from the compact win-x64 build. Run without -Standalone."
+    }
+
+    $isccCandidates = @(
+    "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+    "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
+    "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe"
+) | Where-Object { $_ -and (Test-Path $_) }
+    $iscc = $isccCandidates | Select-Object -First 1
+    if (-not $iscc) {
+        throw "Inno Setup 6 was not found. Install it with: winget install JRSoftware.InnoSetup"
+    }
+
+    $source = Join-Path $PublishRoot "compact/win-x64"
+    $installerOutput = Join-Path $Dist "installer"
+    New-Item -ItemType Directory -Force $installerOutput | Out-Null
+    & $iscc "/DMyAppVersion=$Version" "/DSourceDir=$source" "/DOutputDir=$installerOutput" (Join-Path $Root "packaging/windows/AmneziaMonitor.iss")
+    Assert-NativeCommandSuccess "Windows installer build"
+
+    $setup = Join-Path $installerOutput "AmneziaMonitor-v$Version-win-x64-setup.exe"
+    & (Join-Path $PSScriptRoot "sign-windows.ps1") -Files $setup
 }

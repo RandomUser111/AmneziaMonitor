@@ -8,7 +8,7 @@
 
 The application is an independent project and is **not affiliated with or endorsed by Amnezia**. The public Amnezia source code and documentation are used only as compatibility references.
 
-> Version: **1.0.2**  
+> Version: **1.4.0**  
 > Platforms: **Windows / Linux**  
 > License: **GPL-3.0**
 
@@ -40,6 +40,21 @@ Detailed client management currently targets **WireGuard and AmneziaWG**:
 - QR code for phone import;
 - recover a lost client configuration by rotating that client's key pair while preserving its name and VPN IP.
 
+### Per-client traffic statistics
+
+Amnezia Monitor records WireGuard / AmneziaWG traffic-counter deltas for every client approximately every 30 seconds. The **Client traffic** page can show usage for the last 1 hour, 6 hours, 24 hours, 7 days, or 30 days.
+
+For each client it displays:
+
+- downloaded traffic;
+- uploaded traffic;
+- total traffic;
+- share of all VPN client traffic in the selected period;
+- protocol and VPN IP;
+- search by name, VPN IP, protocol, or public key.
+
+Statistics are stored locally in `monitoring.db`. Per-client history starts accumulating after version 1.3.0 is installed; older aggregate history cannot be reconstructed per client.
+
 ### History and diagnostics
 
 - Local SQLite monitoring history.
@@ -55,7 +70,12 @@ Official Amnezia containers are often launched with Docker `--log-driver none`; 
 
 - Light, dark and system themes.
 - Theme preference persistence.
+- English and Russian interface; English is used by default.
+- Language can be switched instantly in Settings and the preference is saved between launches.
 - Native application icon.
+- System tray mode with background monitoring.
+- Desktop notifications for SSH disconnect/reconnect events and VPN container state changes.
+- Automatic stable-release update checks with a persistent preference and GitHub Release link.
 - Secure password storage:
   - **Windows:** Windows Credential Manager;
   - **Linux:** Secret Service through `secret-tool` / libsecret.
@@ -68,11 +88,13 @@ The main application sections are:
 
 - **Overview** — current server and VPN state;
 - **History** — stored monitoring charts;
+- **Client traffic** — per-client usage statistics by period;
 - **Servers** — saved VPS profiles and switching;
 - **Clients** — WireGuard / AmneziaWG peers;
 - **Protocols** — detected Amnezia containers and Docker controls;
 - **Journal** — local application events and Docker logs;
-- **Settings** — appearance and local-storage information.
+- **Backup & migration** — portable full backup and restore/migration workflow;
+- **Settings** — appearance, interface language, tray and notification options.
 
 ## Download
 
@@ -86,17 +108,22 @@ Expected release assets:
 
 | Platform | Archive |
 |---|---|
-| Windows x64 | `AmneziaMonitor-v1.0.2-win-x64.zip` |
-| Windows ARM64 | `AmneziaMonitor-v1.0.2-win-arm64.zip` |
-| Linux x64 | `AmneziaMonitor-v1.0.2-linux-x64.tar.gz` |
-| Linux ARM64 | `AmneziaMonitor-v1.0.2-linux-arm64.tar.gz` |
+| Windows x64 | `AmneziaMonitor-v1.4.0-win-x64.zip` |
+| Windows ARM64 | `AmneziaMonitor-v1.4.0-win-arm64.zip` |
+| Linux x64 | `AmneziaMonitor-v1.4.0-linux-x64.tar.gz` |
+| Linux ARM64 | `AmneziaMonitor-v1.4.0-linux-arm64.tar.gz` |
+| Windows x64 installer | `AmneziaMonitor-v1.4.0-win-x64-setup.exe` |
+| Debian/Ubuntu x64 | `amnezia-monitor_1.4.0_amd64.deb` |
+| Debian/Ubuntu ARM64 | `amnezia-monitor_1.4.0_arm64.deb` |
+| RPM x64 | `amnezia-monitor-1.4.0-1.x86_64.rpm` |
+| RPM ARM64 | `amnezia-monitor-1.4.0-1.aarch64.rpm` |
 
 ### Windows
 
 1. Install .NET 10 Runtime if it is not already installed.
 2. Extract the ZIP archive completely. Do not run the EXE directly from inside the ZIP.
 3. Run `AmneziaMonitor.exe`.
-3. Windows SmartScreen may warn about an unsigned application until code signing is configured for future releases.
+3. Prefer the signed installer when available. Windows release executables are Authenticode-signed when repository signing credentials are configured.
 
 ### Linux
 
@@ -122,14 +149,45 @@ sudo apt install libsecret-tools
 
 The desktop session must also provide a compatible Secret Service implementation (for example GNOME Keyring or KDE Wallet integration).
 
+## Distribution and updates
+
+Version 1.4.0 adds a complete distribution pipeline:
+
+- Authenticode signing support for Windows application and installer executables;
+- per-user Windows x64 installer generated with Inno Setup;
+- `.deb` packages for amd64/arm64;
+- `.rpm` packages for x86_64/aarch64;
+- automatic update checks against the latest stable GitHub Release;
+- update banner and manual **Check now** action in Settings.
+
+Windows signing requires a trusted code-signing certificate configured through GitHub Actions secrets. See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md) for the signing secrets, package layout, local installer build instructions and release procedure.
+
+The application only checks release metadata and opens the release page. It does not silently download or execute updates.
+
 ## Startup diagnostics
 
-Release 1.0.2 writes a small startup log so silent startup failures can be diagnosed.
+Release 1.4.0 writes a small startup log so silent startup failures can be diagnosed.
 
 - Windows: `%LOCALAPPDATA%\AmneziaMonitor\startup.log`
 - Linux: usually `~/.local/share/AmneziaMonitor/startup.log`
 
 If the process starts but the window does not appear, attach this file to a bug report. If the log file is not created at all, the problem occurred before managed application startup (for example a missing .NET runtime or OS loader failure).
+
+## Full backup and server migration
+
+Version 1.2.0 added a portable full-backup workflow. A backup contains:
+
+- `/opt/amnezia` configuration and keys;
+- Amnezia Docker container metadata;
+- custom Docker network metadata;
+- named Docker volumes used by Amnezia containers;
+- Docker images required to recreate the backed-up containers.
+
+Backups use the `.ambackup` extension and are stored on the local computer. Restore uploads the backup to the currently connected target server, restores the Amnezia configuration, volumes and images, recreates networks/containers, verifies the expected containers and performs a best-effort rollback if restoration fails. A target-side safety archive of the previous `/opt/amnezia` is created before destructive changes.
+
+> **Endpoint limitation:** preserving all server keys, client identities, VPN addresses and ports is not enough to make an old client configuration discover a different public IP. Existing client configs continue to work without changes only when the endpoint remains valid — for example, the same floating/public IP is moved to the new VPS, or the client config already uses a DNS name and that DNS record is updated to the new server. If a client profile contains the old literal IP address, that endpoint must be changed on the client.
+
+For the safest migration, restore to a clean Linux server with Docker installed and SSH/root (or passwordless sudo) access.
 
 ## Server requirements
 
@@ -146,7 +204,7 @@ Non-secret application data is stored under the OS application-data directory in
 Typical files include:
 
 - `servers.json` — saved server profiles, without SSH passwords;
-- `settings.json` — UI preferences such as theme;
+- `settings.json` — UI preferences such as theme and language;
 - `monitoring.db` — SQLite monitoring history;
 - `events.jsonl` — local event journal.
 
@@ -212,7 +270,7 @@ To create the larger standalone packages with the .NET runtime included:
 or on Linux:
 
 ```bash
-./scripts/publish-release.sh 1.0.2 standalone
+./scripts/publish-release.sh 1.4.0 standalone
 ```
 
 Standalone output is intentionally larger because it contains the .NET runtime and platform native libraries. It is not the recommended default GitHub download.
@@ -222,13 +280,13 @@ Standalone output is intentionally larger because it contains the .NET runtime a
 Two workflows are included:
 
 - **Build** — restores and builds the solution on Windows and Linux for pushes and pull requests.
-- **Release** — when a tag such as `v1.0.2` is pushed, builds all four compact platform archives and attaches them to a GitHub Release.
+- **Release** — when a tag such as `v1.4.0` is pushed, builds portable archives, the Windows x64 installer, Linux `.deb`/`.rpm` packages, and attaches them to a GitHub Release.
 
 Example release tag:
 
 ```bash
-git tag v1.0.2
-git push origin v1.0.2
+git tag v1.4.0
+git push origin v1.4.0
 ```
 
 ## Project structure
@@ -244,19 +302,16 @@ scripts/                            local release scripts
 
 ## Current scope / limitations
 
-Version 1.0 intentionally focuses on reliable server monitoring and WireGuard/AmneziaWG management.
+Version 1.4 includes multi-server monitoring, WireGuard/AmneziaWG client management, per-client traffic statistics, system tray/background monitoring, desktop notifications, portable full-server backup/migration, packaged Windows/Linux distribution, and automatic update checks.
 
 Not yet implemented as full management features:
 
 - OpenVPN client creation/revocation;
 - XRay client creation/revocation;
 - SSH public-key authentication UI;
-- full-server Amnezia backup/restore wizard;
-- tray/background notifications;
-- automatic application updates;
-- signed Windows binaries and packaged Linux `.deb` / `.rpm` installers.
+- configurable alert thresholds and notification rules.
 
-These are suitable post-1.0 features rather than blockers for the first stable release. See [ROADMAP.md](ROADMAP.md).
+See [ROADMAP.md](ROADMAP.md).
 
 ## Compatibility note
 

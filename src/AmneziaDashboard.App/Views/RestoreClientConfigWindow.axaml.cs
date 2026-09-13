@@ -1,12 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class RestoreClientConfigWindow : Window
 {
     public RestoreClientConfigWindow()
-        : this("Клиент", "—", "—")
+        : this(LocalizationService.T("Client", "Клиент"), "—", "—")
     {
     }
 

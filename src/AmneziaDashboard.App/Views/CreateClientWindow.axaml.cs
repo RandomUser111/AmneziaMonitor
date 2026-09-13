@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AmneziaDashboard.App.ViewModels;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class CreateClientWindow : Window
@@ -30,13 +31,13 @@ public partial class CreateClientWindow : Window
         var name = ClientNameBox.Text?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(name))
         {
-            ValidationText.Text = "Введите имя клиента.";
+            ValidationText.Text = LocalizationService.T("Enter a client name.", "Введите имя клиента.");
             return;
         }
 
         if (ProtocolBox.SelectedItem is not ProtocolStatusViewModel protocol)
         {
-            ValidationText.Text = "Выберите WireGuard или AmneziaWG.";
+            ValidationText.Text = LocalizationService.T("Select WireGuard or AmneziaWG.", "Выберите WireGuard или AmneziaWG.");
             return;
         }
 

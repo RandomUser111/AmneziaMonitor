@@ -9,12 +9,12 @@
 
     <Grid RowDefinitions="Auto,*" RowSpacing="12">
         <StackPanel Spacing="2">
-            <TextBlock FontSize="28" FontWeight="SemiBold" Text="Журнал" />
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="{DynamicResource Loc.Logs.Title}" />
             <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding ServerText}" />
         </StackPanel>
 
         <TabControl Grid.Row="1">
-            <TabItem Header="События">
+            <TabItem Header="{DynamicResource Loc.Logs.EventsTab}">
                 <Grid Margin="0,12,0,0" RowDefinitions="Auto,*" RowSpacing="10">
                     <Border
                         Padding="10"
@@ -26,7 +26,7 @@
                             <TextBox
                                 Height="36"
                                 VerticalContentAlignment="Center"
-                                PlaceholderText="Поиск по журналу"
+                                PlaceholderText="{DynamicResource Loc.Logs.Search}"
                                 Text="{Binding SearchText}" />
                             <ComboBox
                                 Grid.Column="1"
@@ -39,7 +39,7 @@
                                 Height="36"
                                 Padding="14,0"
                                 Click="ClearEvents_Click"
-                                Content="Очистить" />
+                                Content="{DynamicResource Loc.Common.Clear}" />
                         </Grid>
                     </Border>
 
@@ -57,8 +57,8 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Spacing="5">
-                                <TextBlock HorizontalAlignment="Center" FontSize="15" FontWeight="SemiBold" Text="Журнал пока пуст" />
-                                <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Text="События подключения, клиентов и Docker появятся здесь." />
+                                <TextBlock HorizontalAlignment="Center" FontSize="15" FontWeight="SemiBold" Text="{DynamicResource Loc.Logs.Empty}" />
+                                <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Logs.EmptyDescription}" />
                             </StackPanel>
 
                             <Grid IsVisible="{Binding HasEvents}" RowDefinitions="40,*">
@@ -68,10 +68,10 @@
                                     BorderBrush="{DynamicResource BorderSoftBrush}"
                                     BorderThickness="0,0,0,1">
                                     <Grid ColumnDefinitions="145,85,100,*" ColumnSpacing="10">
-                                        <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Время" />
-                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Уровень" />
-                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Категория" />
-                                        <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Событие" />
+                                        <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Logs.Time}" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Logs.Level}" />
+                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Logs.Category}" />
+                                        <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Logs.Event}" />
                                     </Grid>
                                 </Border>
 
@@ -82,8 +82,8 @@
                                                 <Border Padding="12,9" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,0,1">
                                                     <Grid ColumnDefinitions="145,85,100,*" ColumnSpacing="10">
                                                         <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding TimeText}" />
-                                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{Binding LevelBrush}" Text="{Binding Level}" />
-                                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Category}" />
+                                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{Binding LevelBrush}" Text="{Binding LevelText}" />
+                                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding CategoryText}" />
                                                         <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="{Binding Message}" />
                                                     </Grid>
                                                 </Border>
@@ -135,7 +135,7 @@
                                 Padding="16,0"
                                 IsEnabled="{Binding CanReadDockerLogs}"
                                 Click="RefreshDockerLogs_Click"
-                                Content="Обновить" />
+                                Content="{DynamicResource Loc.Common.Refresh}" />
 
                             <TextBlock
                                 Grid.Column="3"

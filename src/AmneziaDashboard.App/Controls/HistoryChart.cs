@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
+using AmneziaDashboard.App.Services;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -514,7 +515,7 @@ public sealed class HistoryChart : Control
     private static string FormatRate(double bytesPerSecond)
     {
         var value = Math.Max(0, bytesPerSecond);
-        string[] units = ["Б/с", "КБ/с", "МБ/с", "ГБ/с"];
+        string[] units = LocalizationService.IsRussian ? ["Б/с", "КБ/с", "МБ/с", "ГБ/с"] : ["B/s", "KB/s", "MB/s", "GB/s"];
         var unit = 0;
 
         while (value >= 1024 && unit < units.Length - 1)

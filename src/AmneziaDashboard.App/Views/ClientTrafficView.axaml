@@ -1,0 +1,169 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.ClientTrafficView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:ClientTrafficViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <StackPanel Spacing="2">
+                    <TextBlock
+                        FontSize="28"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Loc.Traffic.Title}" />
+                    <TextBlock
+                        FontSize="13"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding ServerTitle}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Spacing="6">
+                    <Button Width="58" Height="34" Click="HourButton_Click" Content="{DynamicResource Loc.History.1h}" />
+                    <Button Width="58" Height="34" Click="SixHoursButton_Click" Content="{DynamicResource Loc.History.6h}" />
+                    <Button Width="62" Height="34" Click="DayButton_Click" Content="{DynamicResource Loc.History.24h}" />
+                    <Button Width="68" Height="34" Click="WeekButton_Click" Content="{DynamicResource Loc.History.7d}" />
+                    <Button Width="72" Height="34" Click="MonthButton_Click" Content="{DynamicResource Loc.Traffic.30d}" />
+                    <Button Width="94" Height="34" Click="RefreshButton_Click" Content="{DynamicResource Loc.Common.Refresh}" />
+                </StackPanel>
+            </Grid>
+
+            <Border
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                        <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding PeriodText}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{DynamicResource Loc.Traffic.CollectionNote}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <ProgressBar Width="70" Height="4" IsVisible="{Binding IsLoading}" IsIndeterminate="{Binding IsLoading}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{DynamicResource TextMutedBrush}"
+                            Text="{Binding StatusText}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+                <Border Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="3">
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="{DynamicResource Loc.Traffic.Total}" />
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding TotalSummary}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="3">
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="{DynamicResource Loc.Traffic.Download}" />
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding DownloadSummary}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="3">
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="{DynamicResource Loc.Traffic.Upload}" />
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding UploadSummary}" />
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="3">
+                        <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="{DynamicResource Loc.Traffic.Clients}" />
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding ClientsSummary}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border
+                Padding="10"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <TextBox
+                    Height="36"
+                    VerticalContentAlignment="Center"
+                    Text="{Binding SearchText, Mode=TwoWay}"
+                    PlaceholderText="{DynamicResource Loc.Traffic.Search}" />
+            </Border>
+
+            <Border
+                IsVisible="{Binding HasNoRows}"
+                Padding="28"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="{DynamicResource Loc.Traffic.NoData}" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{DynamicResource Loc.Traffic.NoDataDescription}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                IsVisible="{Binding HasRows}"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10"
+                ClipToBounds="True">
+                <StackPanel>
+                    <Border Padding="12,9" Background="{DynamicResource SurfaceAltBrush}">
+                        <Grid ColumnDefinitions="2*,1.1*,1.3*,1*,1*,1*,0.7*" ColumnSpacing="10">
+                            <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Client}" />
+                            <TextBlock Grid.Column="1" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Protocol}" />
+                            <TextBlock Grid.Column="2" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.VpnIp}" />
+                            <TextBlock Grid.Column="3" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Download}" />
+                            <TextBlock Grid.Column="4" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Upload}" />
+                            <TextBlock Grid.Column="5" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Total}" />
+                            <TextBlock Grid.Column="6" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Traffic.Share}" />
+                        </Grid>
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ClientTrafficRowViewModel">
+                                <Border Padding="12,10" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,1,0,0">
+                                    <Grid ColumnDefinitions="2*,1.1*,1.3*,1*,1*,1*,0.7*" ColumnSpacing="10">
+                                        <StackPanel Spacing="1">
+                                            <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding ContainerName}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Protocol}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="12" Text="{Binding Address}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12" Text="{Binding DownloadText}" />
+                                        <TextBlock Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12" Text="{Binding UploadText}" />
+                                        <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" Text="{Binding TotalText}" />
+                                        <TextBlock Grid.Column="6" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding ShareText}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

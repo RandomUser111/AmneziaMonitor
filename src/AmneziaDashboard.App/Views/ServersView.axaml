@@ -13,12 +13,12 @@
                 <TextBlock
                     FontSize="28"
                     FontWeight="SemiBold"
-                    Text="Серверы" />
+                    Text="{DynamicResource Loc.Nav.Servers}" />
 
                 <TextBlock
                     FontSize="13"
                     Foreground="{DynamicResource TextSecondaryBrush}"
-                    Text="Сохранённые Amnezia VPN серверы и быстрое переключение между ними" />
+                    Text="{DynamicResource Loc.Servers.Subtitle}" />
             </StackPanel>
 
             <Button
@@ -29,7 +29,7 @@
                 Foreground="White"
                 FontWeight="SemiBold"
                 Click="AddServer_Click"
-                Content="+ Добавить сервер" />
+                Content="{DynamicResource Loc.Servers.AddPlus}" />
         </Grid>
 
         <Border
@@ -44,7 +44,7 @@
                 <TextBlock
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource TextSecondaryBrush}"
-                    Text="Текущий сервер:" />
+                    Text="{DynamicResource Loc.Servers.Current}" />
                 <TextBlock
                     Grid.Column="1"
                     VerticalAlignment="Center"
@@ -55,7 +55,7 @@
                     VerticalAlignment="Center"
                     FontSize="11"
                     Foreground="{DynamicResource TextMutedBrush}"
-                    Text="Также можно переключаться из верхней панели" />
+                    Text="{DynamicResource Loc.Servers.TopSwitchHint}" />
             </Grid>
         </Border>
 
@@ -75,11 +75,11 @@
                         HorizontalAlignment="Center"
                         FontSize="17"
                         FontWeight="SemiBold"
-                        Text="Сохранённых серверов пока нет" />
+                        Text="{DynamicResource Loc.Servers.None}" />
                     <TextBlock
                         HorizontalAlignment="Center"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Добавьте первый VPS, чтобы он появился в списке быстрого переключения." />
+                        Text="{DynamicResource Loc.Servers.NoneDescription}" />
                     <Button
                         Margin="0,8,0,0"
                         Width="145"
@@ -87,7 +87,7 @@
                         Background="{DynamicResource AccentBrush}"
                         Foreground="White"
                         Click="AddServer_Click"
-                        Content="Добавить сервер" />
+                        Content="{DynamicResource Loc.Servers.Add}" />
                 </StackPanel>
             </Border>
 
@@ -157,18 +157,18 @@
                                                 Height="34"
                                                 IsEnabled="{Binding CanConnect}"
                                                 Click="ConnectServer_Click"
-                                                Content="Подключиться" />
+                                                Content="{DynamicResource Loc.Common.Connect}" />
                                             <Button
                                                 Width="82"
                                                 Height="34"
                                                 Click="EditServer_Click"
-                                                Content="Изменить" />
+                                                Content="{DynamicResource Loc.Common.Edit}" />
                                             <Button
                                                 Width="76"
                                                 Height="34"
                                                 Foreground="{DynamicResource StatusErrorBrush}"
                                                 Click="DeleteServer_Click"
-                                                Content="Удалить" />
+                                                Content="{DynamicResource Loc.Common.Delete}" />
                                         </StackPanel>
 
                                         <Grid
@@ -200,7 +200,7 @@
                                                     <TextBlock
                                                         FontSize="10"
                                                         Foreground="{DynamicResource TextMutedBrush}"
-                                                        Text="УЧЁТНЫЕ ДАННЫЕ" />
+                                                        Text="{DynamicResource Loc.Servers.Credentials}" />
                                                     <TextBlock
                                                         FontSize="12"
                                                         Text="{Binding PasswordStatusText}" />
@@ -216,7 +216,7 @@
                                                     <TextBlock
                                                         FontSize="10"
                                                         Foreground="{DynamicResource TextMutedBrush}"
-                                                        Text="ЗАПУСК" />
+                                                        Text="{DynamicResource Loc.Servers.Startup}" />
                                                     <TextBlock
                                                         FontSize="12"
                                                         Text="{Binding AutoConnectText}" />

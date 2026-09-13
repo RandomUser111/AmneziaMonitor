@@ -1,0 +1,60 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.BackupView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:BackupViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+            <StackPanel Spacing="2">
+                <TextBlock FontSize="28" FontWeight="SemiBold" Text="{DynamicResource Loc.Backup.Title}" />
+                <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Backup.Subtitle}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="2">
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Dashboard.Server}" />
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="{Binding CurrentServer}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding StatusText}" TextWrapping="Wrap" MaxWidth="440" />
+                </Grid>
+            </Border>
+
+            <Border Padding="14" Background="#FFF7ED" BorderBrush="#FDBA74" BorderThickness="1" CornerRadius="10">
+                <TextBlock Foreground="#9A3412" Text="{DynamicResource Loc.Backup.EndpointWarning}" TextWrapping="Wrap" />
+            </Border>
+
+            <Border Padding="14" Background="#FEF2F2" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="10">
+                <TextBlock Foreground="#991B1B" Text="{DynamicResource Loc.Backup.SecretWarning}" TextWrapping="Wrap" />
+            </Border>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                <Border Padding="16" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="12">
+                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="{DynamicResource Loc.Backup.Create}" />
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Backup.CreateDescription}" TextWrapping="Wrap" />
+                        <Button Height="38" Classes="ActionButton" Click="CreateBackup_Click" Content="{DynamicResource Loc.Backup.Create}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Padding="16" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                    <StackPanel Spacing="12">
+                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="{DynamicResource Loc.Backup.Restore}" />
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Backup.RestoreDescription}" TextWrapping="Wrap" />
+                        <Button Height="38" Click="RestoreBackup_Click" Content="{DynamicResource Loc.Backup.Restore}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border IsVisible="{Binding IsBusy}" Padding="14" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1" CornerRadius="10">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" Height="8" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -5,7 +5,7 @@
     xmlns:vm="using:AmneziaDashboard.App.ViewModels"
     xmlns:core="using:AmneziaDashboard.Core.Models"
     x:DataType="vm:ConnectServerViewModel"
-    Title="Подключение к серверу"
+    Title="{DynamicResource Loc.Connect.WindowTitle}"
     Width="470"
     Height="690"
     CanResize="False"
@@ -47,7 +47,7 @@
                         <TextBlock
                             FontSize="12"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Text="Сохранённые серверы" />
+                            Text="{DynamicResource Loc.Connect.SavedServers}" />
 
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <ComboBox
@@ -78,7 +78,7 @@
                                 Height="38"
                                 IsEnabled="{Binding CanDeleteProfile}"
                                 Click="DeleteProfileButton_Click"
-                                Content="Удалить" />
+                                Content="{DynamicResource Loc.Common.Delete}" />
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -87,7 +87,7 @@
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Название" />
+                        Text="{DynamicResource Loc.Common.Name}" />
 
                     <TextBox
                         Height="38"
@@ -99,7 +99,7 @@
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="IP-адрес или имя сервера" />
+                        Text="{DynamicResource Loc.Connect.Host}" />
 
                     <TextBox
                         Height="38"
@@ -114,7 +114,7 @@
                         <TextBlock
                             FontSize="12"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Text="Пользователь" />
+                            Text="{DynamicResource Loc.Connect.User}" />
 
                         <TextBox
                             Height="38"
@@ -129,7 +129,7 @@
                         <TextBlock
                             FontSize="12"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Text="SSH-порт" />
+                            Text="{DynamicResource Loc.Connect.Port}" />
 
                         <NumericUpDown
                             Height="38"
@@ -144,7 +144,7 @@
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Пароль" />
+                        Text="{DynamicResource Loc.Connect.Password}" />
 
                     <TextBox
                         Height="38"
@@ -156,12 +156,12 @@
                 <CheckBox
                     IsVisible="{Binding ShowSaveProfileOption}"
                     IsChecked="{Binding SaveProfile}"
-                    Content="Сохранить параметры сервера" />
+                    Content="{DynamicResource Loc.Connect.SaveProfile}" />
 
                 <CheckBox
                     IsEnabled="{Binding SecureStorageAvailable}"
                     IsChecked="{Binding RememberPassword}"
-                    Content="Сохранить SSH-пароль безопасно" />
+                    Content="{DynamicResource Loc.Connect.SavePassword}" />
 
                 <TextBlock
                     Margin="24,-8,0,0"
@@ -173,7 +173,7 @@
                 <CheckBox
                     IsEnabled="{Binding RememberPassword}"
                     IsChecked="{Binding AutoConnect}"
-                    Content="Подключаться к этому серверу автоматически при запуске" />
+                    Content="{DynamicResource Loc.Connect.AutoConnect}" />
 
                 <TextBlock
                     MinHeight="20"
@@ -204,7 +204,7 @@
                 Width="90"
                 Height="36"
                 Click="CancelButton_Click"
-                Content="Отмена" />
+                Content="{DynamicResource Loc.Common.Cancel}" />
 
             <Button
                 Grid.Column="2"

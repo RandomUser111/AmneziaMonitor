@@ -12,7 +12,7 @@ namespace AmneziaDashboard.App.ViewModels;
 
 public partial class ServersViewModel : ViewModelBase
 {
-    public const string PasswordRequiredMessage = "Требуется ввод SSH-пароля.";
+    public static string PasswordRequiredMessage => LocalizationService.T("SSH password is required.", "Требуется ввод SSH-пароля.");
 
     private readonly DashboardViewModel _dashboard;
     private readonly IServerProfileStore _profileStore;
@@ -40,7 +40,7 @@ public partial class ServersViewModel : ViewModelBase
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
 
     public string CurrentServerName =>
-        Servers.FirstOrDefault(x => x.IsCurrent)?.Name ?? "Сервер не выбран";
+        Servers.FirstOrDefault(x => x.IsCurrent)?.Name ?? LocalizationService.T("No server selected", "Сервер не выбран");
 
     public bool SecureStorageAvailable => _secretStore.IsAvailable;
 
@@ -58,6 +58,16 @@ public partial class ServersViewModel : ViewModelBase
         _secretStore = secretStore;
         _probeService = probeService;
         _eventLog = eventLog;
+        LocalizationService.LanguageChanged += LocalizationServiceOnLanguageChanged;
+    }
+
+
+    private void LocalizationServiceOnLanguageChanged(object? sender, EventArgs e)
+    {
+        foreach (var item in Servers)
+            item.NotifyLocalizationChanged();
+
+        OnPropertyChanged(nameof(CurrentServerName));
     }
 
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
@@ -82,10 +92,10 @@ public partial class ServersViewModel : ViewModelBase
         CancellationToken cancellationToken = default)
     {
         if (IsBusy)
-            return OperationResult.Fail("Подождите завершения текущего подключения.");
+            return OperationResult.Fail(LocalizationService.T("Wait for the current connection attempt to finish.", "Подождите завершения текущего подключения."));
 
         if (item.IsCurrent)
-            return OperationResult.Ok("Этот сервер уже подключён.");
+            return OperationResult.Ok(LocalizationService.T("This server is already connected.", "Этот сервер уже подключён."));
 
         string? password = null;
         if (item.Profile.RememberPassword && _secretStore.IsAvailable)
@@ -108,7 +118,7 @@ public partial class ServersViewModel : ViewModelBase
         CancellationToken cancellationToken = default)
     {
         if (IsBusy)
-            return OperationResult.Fail("Подождите завершения текущего подключения.");
+            return OperationResult.Fail(LocalizationService.T("Wait for the current connection attempt to finish.", "Подождите завершения текущего подключения."));
 
         if (string.IsNullOrEmpty(password))
         {
@@ -117,7 +127,7 @@ public partial class ServersViewModel : ViewModelBase
         }
 
         IsBusy = true;
-        StatusMessage = $"Подключение к «{profile.Name}»…";
+        StatusMessage = LocalizationService.T($"Connecting to \"{profile.Name}\"…", $"Подключение к «{profile.Name}»…");
 
         try
         {
@@ -134,9 +144,9 @@ public partial class ServersViewModel : ViewModelBase
             if (!probe.Success)
             {
                 StatusMessage = string.IsNullOrWhiteSpace(probe.ErrorMessage)
-                    ? "Не удалось подключиться к серверу."
-                    : probe.ErrorMessage;
-                _eventLog?.Error("SSH", $"Не удалось подключиться к {profile.Name}: {StatusMessage}");
+                    ? LocalizationService.T("Could not connect to the server.", "Не удалось подключиться к серверу.")
+                    : LocalizationService.TranslateExternalMessage(probe.ErrorMessage);
+                _eventLog?.Error("SSH", LocalizationService.T($"Could not connect to {profile.Name}: {StatusMessage}", $"Не удалось подключиться к {profile.Name}: {StatusMessage}"));
                 return OperationResult.Fail(StatusMessage);
             }
 
@@ -147,17 +157,17 @@ public partial class ServersViewModel : ViewModelBase
             SetCurrentProfile(profile.Id);
             await RefreshAsync(cancellationToken);
 
-            StatusMessage = $"Подключено: {profile.Name} ({profile.Host}:{profile.Port}).";
+            StatusMessage = LocalizationService.T($"Connected: {profile.Name} ({profile.Host}:{profile.Port}).", $"Подключено: {profile.Name} ({profile.Host}:{profile.Port}).");
             return OperationResult.Ok(StatusMessage);
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "Подключение отменено.";
+            StatusMessage = LocalizationService.T("Connection cancelled.", "Подключение отменено.");
             return OperationResult.Fail(StatusMessage);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Ошибка: {ex.Message}";
+            StatusMessage = LocalizationService.T($"Error: {ex.Message}", $"Ошибка: {ex.Message}");
             return OperationResult.Fail(ex.Message);
         }
         finally
@@ -191,7 +201,7 @@ public partial class ServersViewModel : ViewModelBase
         }
 
         await RefreshAsync(cancellationToken);
-        StatusMessage = $"Подключено: {connection.Name} ({connection.Host}:{connection.Port}).";
+        StatusMessage = LocalizationService.T($"Connected: {connection.Name} ({connection.Host}:{connection.Port}).", $"Подключено: {connection.Name} ({connection.Host}:{connection.Port}).");
     }
 
     public async Task<OperationResult> DeleteAsync(
@@ -200,7 +210,7 @@ public partial class ServersViewModel : ViewModelBase
     {
         if (item.IsCurrent)
         {
-            StatusMessage = "Нельзя удалить сервер, к которому сейчас подключён Monitor. Сначала переключитесь на другой сервер.";
+            StatusMessage = LocalizationService.T("You cannot delete the server Monitor is currently connected to. Switch to another server first.", "Нельзя удалить сервер, к которому сейчас подключён Monitor. Сначала переключитесь на другой сервер.");
             return OperationResult.Fail(StatusMessage);
         }
 
@@ -209,14 +219,14 @@ public partial class ServersViewModel : ViewModelBase
             await _secretStore.DeletePasswordAsync(item.Profile.Id, cancellationToken);
             await _profileStore.DeleteAsync(item.Profile.Id, cancellationToken);
             await RefreshAsync(cancellationToken);
-            StatusMessage = $"Сервер «{item.Name}» удалён.";
-            _eventLog?.Info("Серверы", StatusMessage);
+            StatusMessage = LocalizationService.T($"Server \"{item.Name}\" deleted.", $"Сервер «{item.Name}» удалён.");
+            _eventLog?.Info("Servers", StatusMessage);
             return OperationResult.Ok(StatusMessage);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Не удалось удалить сервер: {ex.Message}";
-            _eventLog?.Error("Серверы", StatusMessage);
+            StatusMessage = LocalizationService.T($"Could not delete server: {ex.Message}", $"Не удалось удалить сервер: {ex.Message}");
+            _eventLog?.Error("Servers", StatusMessage);
             return OperationResult.Fail(ex.Message);
         }
     }

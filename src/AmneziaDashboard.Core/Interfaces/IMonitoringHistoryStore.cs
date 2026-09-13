@@ -8,7 +8,17 @@ public interface IMonitoringHistoryStore
         MonitoringHistoryRecord record,
         CancellationToken cancellationToken = default);
 
+    Task AppendClientTrafficAsync(
+        IReadOnlyList<ClientTrafficHistoryRecord> records,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<MonitoringHistoryRecord>> GetRangeAsync(
+        string serverKey,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ClientTrafficSummary>> GetClientTrafficSummaryAsync(
         string serverKey,
         DateTimeOffset from,
         DateTimeOffset to,

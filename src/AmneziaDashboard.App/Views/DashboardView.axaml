@@ -19,12 +19,12 @@
                         FontSize="28"
                         FontWeight="SemiBold"
                         Foreground="{DynamicResource TextPrimaryBrush}"
-                        Text="Обзор" />
+                        Text="{DynamicResource Loc.Nav.Overview}" />
 
                     <TextBlock
                         FontSize="13"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Состояние VPN-сервера" />
+                        Text="{DynamicResource Loc.Dashboard.Subtitle}" />
                 </StackPanel>
 
                 <Button
@@ -50,7 +50,7 @@
                             FontSize="13"
                             FontWeight="SemiBold"
                             Foreground="{DynamicResource TextPrimaryBrush}"
-                            Text="СЕРВЕР" />
+                            Text="{DynamicResource Loc.Dashboard.Server}" />
 
                         <StackPanel
                             Grid.Column="1"
@@ -118,7 +118,7 @@
                                 <TextBlock
                                     FontSize="11"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Text="Диск" />
+                                    Text="{DynamicResource Loc.Dashboard.Disk}" />
                                 <TextBlock
                                     FontSize="20"
                                     FontWeight="SemiBold"
@@ -156,7 +156,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
-                                Text="Сеть:" />
+                                Text="{DynamicResource Loc.Dashboard.Network}" />
 
                             <TextBlock
                                 VerticalAlignment="Center"
@@ -226,7 +226,7 @@
                             VerticalAlignment="Center"
                             FontSize="12"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Text="Контейнеры Amnezia" />
+                            Text="{DynamicResource Loc.Dashboard.AmneziaContainers}" />
                     </Grid>
 
                     <Border
@@ -309,14 +309,14 @@
                             FontSize="13"
                             FontWeight="SemiBold"
                             Foreground="{DynamicResource TextPrimaryBrush}"
-                            Text="КЛИЕНТЫ" />
+                            Text="{DynamicResource Loc.Dashboard.Clients}" />
 
                         <Grid ColumnDefinitions="*,*">
                             <StackPanel Spacing="4">
                                 <TextBlock
                                     FontSize="11"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Text="Онлайн" />
+                                    Text="{DynamicResource Loc.Common.Online}" />
                                 <TextBlock
                                     FontSize="22"
                                     FontWeight="SemiBold"
@@ -328,7 +328,7 @@
                                 <TextBlock
                                     FontSize="11"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Text="Всего" />
+                                    Text="{DynamicResource Loc.Common.Total}" />
                                 <TextBlock
                                     FontSize="22"
                                     FontWeight="SemiBold"
@@ -352,14 +352,14 @@
                             FontSize="13"
                             FontWeight="SemiBold"
                             Foreground="{DynamicResource TextPrimaryBrush}"
-                            Text="ТРАФИК" />
+                            Text="{DynamicResource Loc.Dashboard.Traffic}" />
 
                         <Grid ColumnDefinitions="*,*">
                             <StackPanel Spacing="4">
                                 <TextBlock
                                     FontSize="11"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Text="Получено" />
+                                    Text="{DynamicResource Loc.Dashboard.Received}" />
                                 <TextBlock
                                     FontSize="20"
                                     FontWeight="SemiBold"
@@ -371,7 +371,7 @@
                                 <TextBlock
                                     FontSize="11"
                                     Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Text="Отправлено" />
+                                    Text="{DynamicResource Loc.Dashboard.Sent}" />
                                 <TextBlock
                                     FontSize="20"
                                     FontWeight="SemiBold"

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Amnezia Monitor
+Comment=Monitor and manage self-hosted Amnezia VPN servers
+Exec=/opt/amnezia-monitor/AmneziaMonitor
+Icon=amnezia-monitor
+Terminal=false
+Categories=Network;Utility;
+StartupNotify=true

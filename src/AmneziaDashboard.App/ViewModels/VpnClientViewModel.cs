@@ -1,16 +1,19 @@
 using System;
 using Avalonia.Media;
 using AmneziaDashboard.Core.Models;
+using AmneziaDashboard.App.Services;
 
 namespace AmneziaDashboard.App.ViewModels;
 
-public sealed class VpnClientViewModel
+public sealed class VpnClientViewModel : ViewModelBase
 {
-    private static readonly IBrush OnlineBrush =
-        new SolidColorBrush(Color.Parse("#22C55E"));
+    private static readonly IBrush OnlineBrush = new SolidColorBrush(Color.Parse("#22C55E"));
+    private static readonly IBrush OfflineBrush = new SolidColorBrush(Color.Parse("#94A3B8"));
 
-    private static readonly IBrush OfflineBrush =
-        new SolidColorBrush(Color.Parse("#94A3B8"));
+    private readonly TimeSpan _handshakeAge;
+    private readonly bool _hasHandshake;
+    private readonly double? _downloadBytesPerSecond;
+    private readonly double? _uploadBytesPerSecond;
 
     public VpnClientViewModel(
         VpnPeerInfo peer,
@@ -29,30 +32,22 @@ public sealed class VpnClientViewModel
             ? DateTimeOffset.FromUnixTimeSeconds(peer.LatestHandshakeUnix)
             : (DateTimeOffset?)null;
 
-        var handshakeAge = handshake.HasValue ? now - handshake.Value : TimeSpan.MaxValue;
-        IsOnline = handshake.HasValue && handshakeAge <= TimeSpan.FromMinutes(3);
+        _handshakeAge = handshake.HasValue ? now - handshake.Value : TimeSpan.MaxValue;
+        _hasHandshake = handshake.HasValue;
+        IsOnline = _hasHandshake && _handshakeAge <= TimeSpan.FromMinutes(3);
         StatusBrush = IsOnline ? OnlineBrush : OfflineBrush;
-        LastHandshake = FormatHandshake(handshakeAge, handshake.HasValue);
 
-        // В WireGuard transfer-rx — байты, полученные сервером от peer,
-        // transfer-tx — байты, отправленные сервером peer.
+        // WireGuard transfer-rx is data received by the server from the peer;
+        // transfer-tx is data sent by the server to the peer.
         DownloadedBytes = peer.SentBytes;
         UploadedBytes = peer.ReceivedBytes;
-        Downloaded = FormatBytes(DownloadedBytes);
-        Uploaded = FormatBytes(UploadedBytes);
 
         if (previousPeer is not null && elapsedSeconds > 0)
         {
             var downloadDelta = Math.Max(0, peer.SentBytes - previousPeer.SentBytes);
             var uploadDelta = Math.Max(0, peer.ReceivedBytes - previousPeer.ReceivedBytes);
-
-            DownloadSpeed = FormatRate(downloadDelta / elapsedSeconds);
-            UploadSpeed = FormatRate(uploadDelta / elapsedSeconds);
-        }
-        else
-        {
-            DownloadSpeed = "—";
-            UploadSpeed = "—";
+            _downloadBytesPerSecond = downloadDelta / elapsedSeconds;
+            _uploadBytesPerSecond = uploadDelta / elapsedSeconds;
         }
     }
 
@@ -64,80 +59,64 @@ public sealed class VpnClientViewModel
     public string Endpoint { get; }
     public bool IsOnline { get; }
     public IBrush StatusBrush { get; }
-    public string LastHandshake { get; }
     public long DownloadedBytes { get; }
     public long UploadedBytes { get; }
-    public string Downloaded { get; }
-    public string Uploaded { get; }
-    public string DownloadSpeed { get; }
-    public string UploadSpeed { get; }
 
-    public string StatusText => IsOnline ? "Онлайн" : "Офлайн";
+    public string LastHandshake => FormatHandshake(_handshakeAge, _hasHandshake);
+    public string Downloaded => FormatBytes(DownloadedBytes);
+    public string Uploaded => FormatBytes(UploadedBytes);
+    public string DownloadSpeed => _downloadBytesPerSecond.HasValue ? FormatRate(_downloadBytesPerSecond.Value) : "—";
+    public string UploadSpeed => _uploadBytesPerSecond.HasValue ? FormatRate(_uploadBytesPerSecond.Value) : "—";
+    public string StatusText => IsOnline ? LocalizationService.T("Online", "Онлайн") : LocalizationService.T("Offline", "Офлайн");
+
+    public void NotifyLocalizationChanged()
+    {
+        OnPropertyChanged(nameof(StatusText));
+        OnPropertyChanged(nameof(LastHandshake));
+        OnPropertyChanged(nameof(Downloaded));
+        OnPropertyChanged(nameof(Uploaded));
+        OnPropertyChanged(nameof(DownloadSpeed));
+        OnPropertyChanged(nameof(UploadSpeed));
+    }
 
     private static string FormatHandshake(TimeSpan age, bool hasHandshake)
     {
         if (!hasHandshake)
-            return "Никогда";
+            return LocalizationService.T("Never", "Никогда");
 
         if (age < TimeSpan.Zero)
             age = TimeSpan.Zero;
 
         if (age.TotalSeconds < 60)
-            return $"{Math.Max(1, (int)age.TotalSeconds)} сек назад";
-
+            return LocalizationService.IsRussian ? $"{Math.Max(1, (int)age.TotalSeconds)} сек назад" : $"{Math.Max(1, (int)age.TotalSeconds)} sec ago";
         if (age.TotalMinutes < 60)
-            return $"{(int)age.TotalMinutes} мин назад";
-
+            return LocalizationService.IsRussian ? $"{(int)age.TotalMinutes} мин назад" : $"{(int)age.TotalMinutes} min ago";
         if (age.TotalHours < 24)
-            return $"{(int)age.TotalHours} ч назад";
+            return LocalizationService.IsRussian ? $"{(int)age.TotalHours} ч назад" : $"{(int)age.TotalHours} h ago";
 
-        return $"{(int)age.TotalDays} дн назад";
+        return LocalizationService.IsRussian ? $"{(int)age.TotalDays} дн назад" : $"{(int)age.TotalDays} d ago";
     }
 
     private static string FormatBytes(long bytes)
     {
         if (bytes < 1024)
-            return $"{bytes} Б";
+            return $"{bytes} {LocalizationService.T("B", "Б")}";
 
         var value = (double)bytes;
-        string[] units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
+        string[] units = LocalizationService.IsRussian ? ["Б", "КБ", "МБ", "ГБ", "ТБ"] : ["B", "KB", "MB", "GB", "TB"];
         var unit = 0;
-
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
-
+        while (value >= 1024 && unit < units.Length - 1) { value /= 1024; unit++; }
         return $"{value:0.#} {units[unit]}";
     }
 
     private static string FormatRate(double bytesPerSecond)
     {
-        if (bytesPerSecond < 0)
-            bytesPerSecond = 0;
-
-        var value = bytesPerSecond;
-        string[] units = ["Б/с", "КБ/с", "МБ/с", "ГБ/с"];
+        var value = Math.Max(0, bytesPerSecond);
+        string[] units = LocalizationService.IsRussian ? ["Б/с", "КБ/с", "МБ/с", "ГБ/с"] : ["B/s", "KB/s", "MB/s", "GB/s"];
         var unit = 0;
-
-        while (value >= 1024 && unit < units.Length - 1)
-        {
-            value /= 1024;
-            unit++;
-        }
-
-        if (unit == 0)
-            return $"{value:0} {units[unit]}";
-
-        return $"{value:0.#} {units[unit]}";
+        while (value >= 1024 && unit < units.Length - 1) { value /= 1024; unit++; }
+        return unit == 0 ? $"{value:0} {units[unit]}" : $"{value:0.#} {units[unit]}";
     }
 
-    private static string ShortKey(string key)
-    {
-        if (key.Length <= 14)
-            return key;
-
-        return $"{key[..7]}…{key[^6..]}";
-    }
+    private static string ShortKey(string key) => key.Length <= 14 ? key : $"{key[..7]}…{key[^6..]}";
 }

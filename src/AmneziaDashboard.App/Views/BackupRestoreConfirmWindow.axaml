@@ -1,0 +1,24 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.BackupRestoreConfirmWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Amnezia Monitor"
+    Width="520"
+    Height="270"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <TextBlock FontSize="22" FontWeight="SemiBold" Text="{DynamicResource Loc.Backup.Restore}" />
+        <StackPanel Grid.Row="1" Margin="0,18,0,0" Spacing="10">
+            <TextBlock Text="{DynamicResource Loc.Backup.RestoreConfirm}" TextWrapping="Wrap" />
+            <TextBlock Foreground="{DynamicResource StatusWarningBrush}" Text="{DynamicResource Loc.Backup.EndpointWarning}" TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Width="100" Height="36" Click="Cancel_Click" Content="{DynamicResource Loc.Common.Cancel}" />
+            <Button Width="150" Height="36" Background="{DynamicResource StatusWarningBrush}" Foreground="White" Click="Restore_Click" Content="{DynamicResource Loc.Backup.Restore}" />
+        </StackPanel>
+    </Grid>
+</Window>

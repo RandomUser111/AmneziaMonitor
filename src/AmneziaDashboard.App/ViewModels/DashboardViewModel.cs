@@ -27,19 +27,21 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly IServerMonitorService _monitorService;
     private readonly IMonitoringHistoryStore? _historyStore;
     private readonly AppEventLogService? _eventLog;
+    private readonly DesktopNotificationService? _notificationService;
     private CancellationTokenSource? _monitorCancellation;
     private ServerMonitorSnapshot? _previousSnapshot;
     private DateTimeOffset? _lastHistorySave;
     private bool _historyCleanupDone;
+    private readonly Dictionary<string, (long Downloaded, long Uploaded)> _lastSavedClientCounters = new(StringComparer.Ordinal);
 
     [ObservableProperty]
-    private string _serverStatus = "Не подключён";
+    private string _serverStatus = LocalizationService.T("Not connected", "Не подключён");
 
     [ObservableProperty]
     private IBrush _serverStatusBrush = OfflineBrush;
 
     [ObservableProperty]
-    private string _serverAddress = "Сервер не выбран";
+    private string _serverAddress = LocalizationService.T("No server selected", "Сервер не выбран");
 
     [ObservableProperty]
     private string _sshStatus = "SSH: —";
@@ -84,10 +86,10 @@ public partial class DashboardViewModel : ViewModelBase
     private bool _hasNoProtocols = true;
 
     [ObservableProperty]
-    private string _protocolsMessage = "Подключитесь к серверу для поиска контейнеров Amnezia.";
+    private string _protocolsMessage = LocalizationService.T("Connect to a server to discover Amnezia containers.", "Подключитесь к серверу для поиска контейнеров Amnezia.");
 
     [ObservableProperty]
-    private string _connectButtonText = "Подключить сервер";
+    private string _connectButtonText = LocalizationService.T("Connect server", "Подключить сервер");
 
     [ObservableProperty]
     private string _dockerVersion = "—";
@@ -96,7 +98,7 @@ public partial class DashboardViewModel : ViewModelBase
     private string _operatingSystem = "—";
 
     [ObservableProperty]
-    private string _monitorStatus = "Мониторинг остановлен";
+    private string _monitorStatus = LocalizationService.T("Monitoring stopped", "Мониторинг остановлен");
 
     public ObservableCollection<ProtocolStatusViewModel> Protocols { get; } = [];
 
@@ -107,11 +109,38 @@ public partial class DashboardViewModel : ViewModelBase
     public DashboardViewModel(
         IServerMonitorService monitorService,
         IMonitoringHistoryStore? historyStore = null,
-        AppEventLogService? eventLog = null)
+        AppEventLogService? eventLog = null,
+        DesktopNotificationService? notificationService = null)
     {
         _monitorService = monitorService;
         _historyStore = historyStore;
         _eventLog = eventLog;
+        _notificationService = notificationService;
+        LocalizationService.LanguageChanged += LocalizationServiceOnLanguageChanged;
+    }
+
+
+    private void LocalizationServiceOnLanguageChanged(object? sender, EventArgs e)
+    {
+        if (CurrentConnection is null)
+        {
+            ServerStatus = LocalizationService.T("Not connected", "Не подключён");
+            ServerAddress = LocalizationService.T("No server selected", "Сервер не выбран");
+            ConnectButtonText = LocalizationService.T("Connect server", "Подключить сервер");
+            MonitorStatus = LocalizationService.T("Monitoring stopped", "Мониторинг остановлен");
+            ProtocolsMessage = LocalizationService.T(
+                "Connect to a server to discover Amnezia containers.",
+                "Подключитесь к серверу для поиска контейнеров Amnezia.");
+        }
+        else
+        {
+            ServerStatus = IsConnected
+                ? LocalizationService.T("Connected", "Подключён")
+                : LocalizationService.T("No connection", "Нет связи");
+            ConnectButtonText = LocalizationService.T("Switch server", "Сменить сервер");
+            if (HasNoProtocols)
+                ProtocolsMessage = LocalizationService.T("No Amnezia containers found.", "Контейнеры Amnezia не найдены.");
+        }
     }
 
     public void ApplyConnection(
@@ -122,10 +151,10 @@ public partial class DashboardViewModel : ViewModelBase
 
         CurrentConnection = connection;
         IsConnected = true;
-        ServerStatus = "Подключён";
+        ServerStatus = LocalizationService.T("Connected", "Подключён");
         ServerStatusBrush = OnlineBrush;
-        ConnectButtonText = "Сменить сервер";
-        MonitorStatus = "Запуск мониторинга…";
+        ConnectButtonText = LocalizationService.T("Switch server", "Сменить сервер");
+        MonitorStatus = LocalizationService.T("Starting monitoring…", "Запуск мониторинга…");
 
         ServerAddress = $"{connection.Name} · {probe.Hostname}";
         SshStatus = $"SSH: {connection.Host}:{connection.Port}";
@@ -156,8 +185,9 @@ public partial class DashboardViewModel : ViewModelBase
         Clients.Clear();
         _previousSnapshot = null;
         _lastHistorySave = null;
+        _lastSavedClientCounters.Clear();
 
-        _eventLog?.Success("SSH", $"Подключено к {connection.Name} ({connection.Host}:{connection.Port}).");
+        _eventLog?.Success("SSH", LocalizationService.T($"Connected to {connection.Name} ({connection.Host}:{connection.Port}).", $"Подключено к {connection.Name} ({connection.Host}:{connection.Port})."));
         StartMonitoring();
     }
 
@@ -234,10 +264,17 @@ public partial class DashboardViewModel : ViewModelBase
         var wasConnected = IsConnected;
         IsConnected = true;
         if (!wasConnected)
-            _eventLog?.Success("Мониторинг", "Связь с сервером восстановлена.");
-        ServerStatus = "Подключён";
+        {
+            var restoredMessage = LocalizationService.T("Server connection restored.", "Связь с сервером восстановлена.");
+            _eventLog?.Success("Monitoring", restoredMessage);
+            _ = _notificationService?.NotifyAsync(
+                LocalizationService.T("Amnezia Monitor", "Amnezia Monitor"),
+                restoredMessage,
+                DesktopNotificationKind.Information);
+        }
+        ServerStatus = LocalizationService.T("Connected", "Подключён");
         ServerStatusBrush = OnlineBrush;
-        MonitorStatus = $"Обновлено {DateTime.Now:HH:mm:ss}";
+        MonitorStatus = LocalizationService.T($"Updated {DateTime.Now:HH:mm:ss}", $"Обновлено {DateTime.Now:HH:mm:ss}");
 
         CpuUsage = ValueOrDash(snapshot.CpuUsage);
         RamUsage = ValueOrDash(snapshot.MemoryUsage);
@@ -264,6 +301,7 @@ public partial class DashboardViewModel : ViewModelBase
             UploadSpeed = "—";
         }
 
+        NotifyContainerStateChanges(_previousSnapshot, snapshot);
         ApplyProtocols(snapshot.AmneziaContainers);
         ApplyClients(snapshot, elapsedSeconds);
 
@@ -275,14 +313,48 @@ public partial class DashboardViewModel : ViewModelBase
         var wasConnected = IsConnected;
         IsConnected = false;
         if (wasConnected)
-            _eventLog?.Warning("Мониторинг", string.IsNullOrWhiteSpace(message)
-                ? "Потеряна связь с сервером."
-                : $"Потеряна связь с сервером: {message}");
-        ServerStatus = "Нет связи";
+        {
+            var lostMessage = string.IsNullOrWhiteSpace(message)
+                ? LocalizationService.T("Server connection lost.", "Потеряна связь с сервером.")
+                : LocalizationService.T($"Server connection lost: {LocalizationService.TranslateExternalMessage(message)}", $"Потеряна связь с сервером: {message}");
+            _eventLog?.Warning("Monitoring", lostMessage);
+            _ = _notificationService?.NotifyAsync(
+                LocalizationService.T("Server disconnected", "Сервер отключён"),
+                lostMessage,
+                DesktopNotificationKind.Error);
+        }
+        ServerStatus = LocalizationService.T("No connection", "Нет связи");
         ServerStatusBrush = ErrorBrush;
         MonitorStatus = string.IsNullOrWhiteSpace(message)
-            ? "Ошибка обновления"
-            : $"Ошибка: {message}";
+            ? LocalizationService.T("Update error", "Ошибка обновления")
+            : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(message)}", $"Ошибка: {message}");
+    }
+
+    private void NotifyContainerStateChanges(ServerMonitorSnapshot? previous, ServerMonitorSnapshot current)
+    {
+        if (previous is null)
+            return;
+
+        var oldByName = previous.AmneziaContainers.ToDictionary(x => x.ContainerName, StringComparer.OrdinalIgnoreCase);
+        foreach (var container in current.AmneziaContainers)
+        {
+            if (!oldByName.TryGetValue(container.ContainerName, out var oldContainer) || oldContainer.IsRunning == container.IsRunning)
+                continue;
+
+            var message = container.IsRunning
+                ? LocalizationService.T($"{container.DisplayName} started.", $"{container.DisplayName} запущен.")
+                : LocalizationService.T($"{container.DisplayName} stopped unexpectedly.", $"{container.DisplayName} неожиданно остановлен.");
+
+            if (container.IsRunning)
+                _eventLog?.Success("Protocol", message);
+            else
+                _eventLog?.Warning("Protocol", message);
+
+            _ = _notificationService?.NotifyAsync(
+                LocalizationService.T("VPN protocol state changed", "Изменилось состояние VPN-протокола"),
+                message,
+                container.IsRunning ? DesktopNotificationKind.Information : DesktopNotificationKind.Error);
+        }
     }
 
     private void ApplyProtocols(IEnumerable<AmneziaContainerInfo> containers)
@@ -298,7 +370,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         ProtocolsMessage = HasProtocols
             ? string.Empty
-            : "Контейнеры Amnezia не найдены.";
+            : LocalizationService.T("No Amnezia containers found.", "Контейнеры Amnezia не найдены.");
     }
 
     private void ApplyClients(ServerMonitorSnapshot snapshot, double elapsedSeconds)
@@ -389,14 +461,56 @@ public partial class DashboardViewModel : ViewModelBase
                 TrafficSentBytes = snapshot.Peers.Sum(x => x.ReceivedBytes)
             };
 
+            var clientTrafficRecords = new List<ClientTrafficHistoryRecord>(snapshot.Peers.Count);
+            var currentCounters = new Dictionary<string, (long Downloaded, long Uploaded)>(StringComparer.Ordinal);
+
+            foreach (var peer in snapshot.Peers)
+            {
+                var clientKey = BuildClientTrafficKey(peer);
+                var downloaded = Math.Max(0, peer.SentBytes);
+                var uploaded = Math.Max(0, peer.ReceivedBytes);
+
+                var downloadDelta = 0L;
+                var uploadDelta = 0L;
+
+                if (_lastSavedClientCounters.TryGetValue(clientKey, out var previousCounters))
+                {
+                    downloadDelta = CalculateCounterDelta(downloaded, previousCounters.Downloaded);
+                    uploadDelta = CalculateCounterDelta(uploaded, previousCounters.Uploaded);
+                }
+
+                currentCounters[clientKey] = (downloaded, uploaded);
+                clientTrafficRecords.Add(new ClientTrafficHistoryRecord
+                {
+                    ServerKey = record.ServerKey,
+                    CapturedAt = snapshot.Timestamp,
+                    ClientKey = clientKey,
+                    ClientId = peer.ClientId,
+                    ClientName = peer.ClientName,
+                    ContainerName = peer.ContainerName,
+                    ProtocolName = peer.ProtocolName,
+                    AllowedIps = peer.AllowedIps,
+                    DownloadTotalBytes = downloaded,
+                    UploadTotalBytes = uploaded,
+                    DownloadDeltaBytes = downloadDelta,
+                    UploadDeltaBytes = uploadDelta
+                });
+            }
+
             await _historyStore.AppendAsync(record, cancellationToken);
+            await _historyStore.AppendClientTrafficAsync(clientTrafficRecords, cancellationToken);
+
+            _lastSavedClientCounters.Clear();
+            foreach (var item in currentCounters)
+                _lastSavedClientCounters[item.Key] = item.Value;
+
             _lastHistorySave = snapshot.Timestamp;
 
             if (!_historyCleanupDone)
             {
                 _historyCleanupDone = true;
                 await _historyStore.CleanupOlderThanAsync(
-                    DateTimeOffset.UtcNow.AddDays(-30),
+                    DateTimeOffset.UtcNow.AddDays(-90),
                     cancellationToken);
             }
         }
@@ -408,6 +522,30 @@ public partial class DashboardViewModel : ViewModelBase
         {
             // Ошибка локальной истории не должна останавливать SSH-мониторинг.
         }
+    }
+
+
+    private static string BuildClientTrafficKey(VpnPeerInfo peer)
+    {
+        var allowedIps = string.Join(",", (peer.AllowedIps ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
+
+        var stablePart = string.IsNullOrWhiteSpace(allowedIps)
+            ? peer.ClientId.Trim()
+            : allowedIps.ToLowerInvariant();
+
+        return $"{peer.ContainerName.Trim().ToLowerInvariant()}|{stablePart}";
+    }
+
+    private static long CalculateCounterDelta(long current, long previous)
+    {
+        if (current < 0)
+            return 0;
+
+        // WireGuard/AWG counters reset when an interface/container restarts.
+        // In that case the current value is the amount transferred since the reset.
+        return current >= previous ? current - previous : current;
     }
 
     private static string BuildServerKey(ServerConnection connection)
@@ -446,10 +584,10 @@ public partial class DashboardViewModel : ViewModelBase
     private static string FormatBytes(long bytes)
     {
         if (bytes < 1024)
-            return $"{bytes} Б";
+            return $"{bytes} {LocalizationService.T("B", "Б")}";
 
         var value = (double)bytes;
-        string[] units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
+        string[] units = LocalizationService.IsRussian ? ["Б", "КБ", "МБ", "ГБ", "ТБ"] : ["B", "KB", "MB", "GB", "TB"];
         var unit = 0;
 
         while (value >= 1024 && unit < units.Length - 1)
@@ -467,7 +605,7 @@ public partial class DashboardViewModel : ViewModelBase
             bytesPerSecond = 0;
 
         var value = bytesPerSecond;
-        string[] units = ["Б/с", "КБ/с", "МБ/с", "ГБ/с"];
+        string[] units = LocalizationService.IsRussian ? ["Б/с", "КБ/с", "МБ/с", "ГБ/с"] : ["B/s", "KB/s", "MB/s", "GB/s"];
         var unit = 0;
 
         while (value >= 1024 && unit < units.Length - 1)

@@ -2,7 +2,7 @@
     x:Class="AmneziaDashboard.App.Views.RevokeClientWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Отозвать доступ"
+    Title="{DynamicResource Loc.Clients.Revoke}"
     Width="470"
     Height="365"
     CanResize="False"
@@ -16,13 +16,13 @@
             <TextBlock
                 FontSize="22"
                 FontWeight="SemiBold"
-                Text="Отозвать VPN-доступ?" />
+                Text="{DynamicResource Loc.Revoke.Question}" />
 
             <TextBlock
                 FontSize="12"
                 Foreground="{DynamicResource TextSecondaryBrush}"
                 TextWrapping="Wrap"
-                Text="Peer будет удалён из активного интерфейса и серверной конфигурации." />
+                Text="{DynamicResource Loc.Revoke.Description}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Margin="0,22,0,0" Spacing="12">
@@ -33,10 +33,10 @@
                 BorderThickness="1"
                 CornerRadius="8">
                 <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="7">
-                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="Клиент" />
+                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Client}" />
                     <TextBlock x:Name="ClientNameText" Grid.Column="1" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
 
-                    <TextBlock Grid.Row="1" Foreground="{DynamicResource TextSecondaryBrush}" Text="Протокол" />
+                    <TextBlock Grid.Row="1" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Protocol}" />
                     <TextBlock x:Name="ProtocolText" Grid.Row="1" Grid.Column="1" />
 
                     <TextBlock Grid.Row="2" Foreground="{DynamicResource TextSecondaryBrush}" Text="VPN IP" />
@@ -54,12 +54,12 @@
                     <TextBlock
                         FontWeight="SemiBold"
                         Foreground="{DynamicResource StatusWarningBrush}"
-                        Text="Перед изменением будет создана резервная копия" />
+                        Text="{DynamicResource Loc.Revoke.BackupTitle}" />
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         TextWrapping="Wrap"
-                        Text="Amnezia Monitor сохранит копии серверного .conf и clientsTable внутри VPN-контейнера. Сам клиентский конфиг на устройстве перестанет подключаться." />
+                        Text="{DynamicResource Loc.Revoke.BackupDetails}" />
                 </StackPanel>
             </Border>
         </StackPanel>
@@ -70,7 +70,7 @@
                 Width="90"
                 Height="36"
                 Click="CancelButton_Click"
-                Content="Отмена" />
+                Content="{DynamicResource Loc.Common.Cancel}" />
 
             <Button
                 Grid.Column="2"
@@ -80,7 +80,7 @@
                 Foreground="White"
                 FontWeight="SemiBold"
                 Click="RevokeButton_Click"
-                Content="Отозвать доступ" />
+                Content="{DynamicResource Loc.Clients.Revoke}" />
         </Grid>
     </Grid>
 </Window>

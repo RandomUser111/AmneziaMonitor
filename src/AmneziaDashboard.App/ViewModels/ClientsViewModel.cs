@@ -40,6 +40,7 @@ public partial class ClientsViewModel : ViewModelBase
         _dashboard.PropertyChanged += DashboardOnPropertyChanged;
         _dashboard.Clients.CollectionChanged += (_, _) => NotifyClientsChanged();
         _dashboard.Protocols.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanCreateClient));
+        LocalizationService.LanguageChanged += LocalizationServiceOnLanguageChanged;
         RebuildFilter();
     }
 
@@ -63,8 +64,8 @@ public partial class ClientsViewModel : ViewModelBase
 
     public string EmptyMessage =>
         _dashboard.IsConnected
-            ? "Для WireGuard / AmneziaWG клиенты не найдены."
-            : "Сначала подключитесь к серверу.";
+            ? LocalizationService.T("No WireGuard / AmneziaWG clients found.", "Для WireGuard / AmneziaWG клиенты не найдены.")
+            : LocalizationService.T("Connect to a server first.", "Сначала подключитесь к серверу." );
 
     public bool CanCreateClient =>
         _dashboard.IsConnected && !IsBusy && GetCreatableProtocols().Count > 0;
@@ -82,10 +83,10 @@ public partial class ClientsViewModel : ViewModelBase
     {
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
-            return CreateClientResult.Fail("Сервер не подключён.");
+            return CreateClientResult.Fail(LocalizationService.T("Server is not connected.", "Сервер не подключён."));
 
         IsBusy = true;
-        OperationMessage = $"Создание клиента {clientName}…";
+        OperationMessage = LocalizationService.T($"Creating client {clientName}…", $"Создание клиента {clientName}…");
 
         try
         {
@@ -95,12 +96,12 @@ public partial class ClientsViewModel : ViewModelBase
                 clientName);
 
             OperationMessage = result.Success
-                ? "Клиент создан. Сохраните выданный .conf-профиль."
-                : $"Ошибка: {result.ErrorMessage}";
+                ? LocalizationService.T("Client created. Save the issued .conf profile.", "Клиент создан. Сохраните выданный .conf-профиль.")
+                : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка: {result.ErrorMessage}");
             if (result.Success)
-                _eventLog?.Success("Клиенты", $"Создан клиент «{clientName}» в {containerName}.");
+                _eventLog?.Success("Clients", LocalizationService.T($"Client \"{clientName}\" created in {containerName}.", $"Создан клиент «{clientName}» в {containerName}."));
             else
-                _eventLog?.Error("Клиенты", $"Ошибка создания «{clientName}»: {result.ErrorMessage}");
+                _eventLog?.Error("Clients", LocalizationService.T($"Failed to create \"{clientName}\": {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка создания «{clientName}»: {result.ErrorMessage}"));
 
             return result;
         }
@@ -116,10 +117,10 @@ public partial class ClientsViewModel : ViewModelBase
     {
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
-            return OperationResult.Fail("Сервер не подключён.");
+            return OperationResult.Fail(LocalizationService.T("Server is not connected.", "Сервер не подключён."));
 
         IsBusy = true;
-        OperationMessage = $"Переименование {client.Name}…";
+        OperationMessage = LocalizationService.T($"Renaming {client.Name}…", $"Переименование {client.Name}…");
 
         try
         {
@@ -130,12 +131,12 @@ public partial class ClientsViewModel : ViewModelBase
                 newName);
 
             OperationMessage = result.Success
-                ? "Имя сохранено. Данные обновятся при следующем цикле мониторинга."
-                : $"Ошибка: {result.ErrorMessage}";
+                ? LocalizationService.T("Name saved. Data will refresh on the next monitoring cycle.", "Имя сохранено. Данные обновятся при следующем цикле мониторинга.")
+                : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка: {result.ErrorMessage}");
             if (result.Success)
-                _eventLog?.Success("Клиенты", $"Клиент «{client.Name}» переименован в «{newName}».");
+                _eventLog?.Success("Clients", LocalizationService.T($"Client \"{client.Name}\" renamed to \"{newName}\".", $"Клиент «{client.Name}» переименован в «{newName}»."));
             else
-                _eventLog?.Error("Клиенты", $"Ошибка переименования «{client.Name}»: {result.ErrorMessage}");
+                _eventLog?.Error("Clients", LocalizationService.T($"Failed to rename \"{client.Name}\": {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка переименования «{client.Name}»: {result.ErrorMessage}"));
 
             return result;
         }
@@ -149,10 +150,10 @@ public partial class ClientsViewModel : ViewModelBase
     {
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
-            return CreateClientResult.Fail("Сервер не подключён.");
+            return CreateClientResult.Fail(LocalizationService.T("Server is not connected.", "Сервер не подключён."));
 
         IsBusy = true;
-        OperationMessage = $"Восстановление конфигурации {client.Name}…";
+        OperationMessage = LocalizationService.T($"Restoring configuration for {client.Name}…", $"Восстановление конфигурации {client.Name}…");
 
         try
         {
@@ -163,12 +164,12 @@ public partial class ClientsViewModel : ViewModelBase
                 client.Name);
 
             OperationMessage = result.Success
-                ? "Конфигурация восстановлена. Сохраните новый .conf-профиль."
-                : $"Ошибка: {result.ErrorMessage}";
+                ? LocalizationService.T("Configuration restored. Save the new .conf profile.", "Конфигурация восстановлена. Сохраните новый .conf-профиль.")
+                : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка: {result.ErrorMessage}");
             if (result.Success)
-                _eventLog?.Warning("Клиенты", $"Для клиента «{client.Name}» перевыпущена конфигурация и ключевая пара.");
+                _eventLog?.Warning("Clients", LocalizationService.T($"Configuration and key pair reissued for client \"{client.Name}\".", $"Для клиента «{client.Name}» перевыпущена конфигурация и ключевая пара."));
             else
-                _eventLog?.Error("Клиенты", $"Ошибка восстановления «{client.Name}»: {result.ErrorMessage}");
+                _eventLog?.Error("Clients", LocalizationService.T($"Failed to restore \"{client.Name}\": {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка восстановления «{client.Name}»: {result.ErrorMessage}"));
 
             return result;
         }
@@ -182,10 +183,10 @@ public partial class ClientsViewModel : ViewModelBase
     {
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
-            return OperationResult.Fail("Сервер не подключён.");
+            return OperationResult.Fail(LocalizationService.T("Server is not connected.", "Сервер не подключён."));
 
         IsBusy = true;
-        OperationMessage = $"Отзыв доступа {client.Name}…";
+        OperationMessage = LocalizationService.T($"Revoking access for {client.Name}…", $"Отзыв доступа {client.Name}…");
 
         try
         {
@@ -196,13 +197,13 @@ public partial class ClientsViewModel : ViewModelBase
 
             OperationMessage = result.Success
                 ? (string.IsNullOrWhiteSpace(result.Message)
-                    ? "Доступ отозван. Список обновится при следующем цикле мониторинга."
-                    : result.Message)
-                : $"Ошибка: {result.ErrorMessage}";
+                    ? LocalizationService.T("Access revoked. The list will refresh on the next monitoring cycle.", "Доступ отозван. Список обновится при следующем цикле мониторинга.")
+                    : LocalizationService.TranslateExternalMessage(result.Message))
+                : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка: {result.ErrorMessage}");
             if (result.Success)
-                _eventLog?.Warning("Клиенты", $"Доступ клиента «{client.Name}» отозван.");
+                _eventLog?.Warning("Clients", LocalizationService.T($"Access for client \"{client.Name}\" revoked.", $"Доступ клиента «{client.Name}» отозван."));
             else
-                _eventLog?.Error("Клиенты", $"Ошибка отзыва «{client.Name}»: {result.ErrorMessage}");
+                _eventLog?.Error("Clients", LocalizationService.T($"Failed to revoke \"{client.Name}\": {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка отзыва «{client.Name}»: {result.ErrorMessage}"));
 
             return result;
         }
@@ -210,6 +211,18 @@ public partial class ClientsViewModel : ViewModelBase
         {
             IsBusy = false;
         }
+    }
+
+
+    private void LocalizationServiceOnLanguageChanged(object? sender, EventArgs e)
+    {
+        foreach (var client in _dashboard.Clients)
+            client.NotifyLocalizationChanged();
+
+        OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(ServerStatus));
+        OnPropertyChanged(nameof(MonitorStatus));
+        NotifyClientsChanged();
     }
 
     partial void OnSearchTextChanged(string value)

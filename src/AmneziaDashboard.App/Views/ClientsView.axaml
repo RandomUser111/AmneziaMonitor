@@ -24,7 +24,7 @@
                 <TextBlock
                     FontSize="28"
                     FontWeight="SemiBold"
-                    Text="Клиенты" />
+                    Text="{DynamicResource Loc.Clients.Title}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock
@@ -40,7 +40,7 @@
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Онлайн:" />
+                        Text="{DynamicResource Loc.Clients.OnlineLabel}" />
 
                     <TextBlock
                         FontSize="12"
@@ -50,7 +50,7 @@
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="из" />
+                        Text="{DynamicResource Loc.Common.Of}" />
 
                     <TextBlock
                         FontSize="12"
@@ -70,7 +70,7 @@
                     FontWeight="SemiBold"
                     IsEnabled="{Binding CanCreateClient}"
                     Click="CreateClient_Click"
-                    Content="Новый клиент" />
+                    Content="{DynamicResource Loc.Clients.NewClient}" />
 
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="2">
                     <TextBlock
@@ -100,16 +100,16 @@
                 <TextBox
                     Height="34"
                     VerticalContentAlignment="Center"
-                    PlaceholderText="Поиск по имени, IP, протоколу, endpoint или ключу"
+                    PlaceholderText="{DynamicResource Loc.Clients.SearchPlaceholder}"
                     Text="{Binding SearchText, Mode=TwoWay}" />
 
                 <ComboBox
                     Grid.Column="1"
                     Height="34"
                     SelectedIndex="{Binding StatusFilterIndex, Mode=TwoWay}">
-                    <ComboBoxItem Content="Все клиенты" />
-                    <ComboBoxItem Content="Только онлайн" />
-                    <ComboBoxItem Content="Только офлайн" />
+                    <ComboBoxItem Content="{DynamicResource Loc.Clients.All}" />
+                    <ComboBoxItem Content="{DynamicResource Loc.Clients.OnlineOnly}" />
+                    <ComboBoxItem Content="{DynamicResource Loc.Clients.OfflineOnly}" />
                 </ComboBox>
 
                 <TextBlock
@@ -118,7 +118,7 @@
                     Margin="8,0,2,0"
                     FontSize="11"
                     Foreground="{DynamicResource TextMutedBrush}"
-                    Text="Автообновление: 5 сек" />
+                    Text="{DynamicResource Loc.Common.AutoRefresh5}" />
             </Grid>
         </Border>
 
@@ -139,7 +139,7 @@
                         HorizontalAlignment="Center"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Text="Нет данных о клиентах" />
+                        Text="{DynamicResource Loc.Clients.NoData}" />
                     <TextBlock
                         HorizontalAlignment="Center"
                         Foreground="{DynamicResource TextSecondaryBrush}"
@@ -155,11 +155,11 @@
                         HorizontalAlignment="Center"
                         FontSize="15"
                         FontWeight="SemiBold"
-                        Text="Ничего не найдено" />
+                        Text="{DynamicResource Loc.Common.NothingFound}" />
                     <TextBlock
                         HorizontalAlignment="Center"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Измените строку поиска или фильтр статуса." />
+                        Text="{DynamicResource Loc.Clients.AdjustFilter}" />
                 </StackPanel>
 
                 <Grid IsVisible="{Binding HasVisibleClients}" RowDefinitions="42,*">
@@ -171,14 +171,14 @@
                         BorderThickness="0,0,0,1"
                         CornerRadius="10,10,0,0">
                         <Grid ColumnDefinitions="24,1.25*,0.9*,1*,0.8*,0.8*,0.8*,0.9*,120" ColumnSpacing="8">
-                            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Клиент" />
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Протокол" />
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Client}" />
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Protocol}" />
                             <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="VPN IP" />
                             <TextBlock Grid.Column="4" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Handshake" />
-                            <TextBlock Grid.Column="5" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="↓ всего" />
-                            <TextBlock Grid.Column="6" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="↑ всего" />
-                            <TextBlock Grid.Column="7" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Скорость" />
-                            <TextBlock Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Действия" />
+                            <TextBlock Grid.Column="5" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Clients.DownloadTotal}" />
+                            <TextBlock Grid.Column="6" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Clients.UploadTotal}" />
+                            <TextBlock Grid.Column="7" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Speed}" />
+                            <TextBlock Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Actions}" />
                         </Grid>
                     </Border>
 
@@ -252,7 +252,7 @@
                                                 Spacing="6">
                                                 <Button
                                                     Classes="ClientAction"
-                                                    ToolTip.Tip="Переименовать клиента"
+                                                    ToolTip.Tip="{DynamicResource Loc.Clients.Rename}"
                                                     Click="RenameClient_Click">
                                                     <PathIcon
                                                         Width="15"
@@ -263,7 +263,7 @@
 
                                                 <Button
                                                     Classes="ClientAction"
-                                                    ToolTip.Tip="Восстановить конфигурацию"
+                                                    ToolTip.Tip="{DynamicResource Loc.Clients.RestoreConfig}"
                                                     Background="Transparent"
                                                     Click="RestoreClientConfig_Click">
                                                     <PathIcon
@@ -275,7 +275,7 @@
 
                                                 <Button
                                                     Classes="ClientAction"
-                                                    ToolTip.Tip="Отозвать доступ"
+                                                    ToolTip.Tip="{DynamicResource Loc.Clients.Revoke}"
                                                     Background="Transparent"
                                                     Click="RevokeClient_Click">
                                                     <PathIcon

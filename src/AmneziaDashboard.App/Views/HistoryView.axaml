@@ -15,7 +15,7 @@
                     <TextBlock
                         FontSize="28"
                         FontWeight="SemiBold"
-                        Text="История" />
+                        Text="{DynamicResource Loc.History.Title}" />
                     <TextBlock
                         FontSize="13"
                         Foreground="{DynamicResource TextSecondaryBrush}"
@@ -27,11 +27,11 @@
                     Orientation="Horizontal"
                     VerticalAlignment="Center"
                     Spacing="6">
-                    <Button Width="58" Height="34" Click="HourButton_Click" Content="1 ч" />
-                    <Button Width="58" Height="34" Click="SixHoursButton_Click" Content="6 ч" />
-                    <Button Width="62" Height="34" Click="DayButton_Click" Content="24 ч" />
-                    <Button Width="68" Height="34" Click="WeekButton_Click" Content="7 дней" />
-                    <Button Width="94" Height="34" Click="RefreshButton_Click" Content="Обновить" />
+                    <Button Width="58" Height="34" Click="HourButton_Click" Content="{DynamicResource Loc.History.1h}" />
+                    <Button Width="58" Height="34" Click="SixHoursButton_Click" Content="{DynamicResource Loc.History.6h}" />
+                    <Button Width="62" Height="34" Click="DayButton_Click" Content="{DynamicResource Loc.History.24h}" />
+                    <Button Width="68" Height="34" Click="WeekButton_Click" Content="{DynamicResource Loc.History.7d}" />
+                    <Button Width="94" Height="34" Click="RefreshButton_Click" Content="{DynamicResource Loc.Common.Refresh}" />
                 </StackPanel>
             </Grid>
 
@@ -79,11 +79,11 @@
                         HorizontalAlignment="Center"
                         FontSize="16"
                         FontWeight="SemiBold"
-                        Text="Пока нет данных для графиков" />
+                        Text="{DynamicResource Loc.History.NoData}" />
                     <TextBlock
                         HorizontalAlignment="Center"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Amnezia Monitor сохраняет одну точку мониторинга примерно раз в 30 секунд."
+                        Text="{DynamicResource Loc.History.StorageNote}"
                         TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
@@ -106,7 +106,7 @@
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="2">
                                 <TextBlock FontSize="14" FontWeight="SemiBold" Text="CPU / RAM" />
-                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Загрузка сервера" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.History.ServerLoad}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
                                 <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource AccentBrush}" Text="CPU" />
@@ -150,8 +150,8 @@
                     <StackPanel Spacing="10">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="2">
-                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="Сеть" />
-                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Скорость внешнего интерфейса" />
+                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Loc.History.Network}" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.History.NetworkSpeed}" />
                             </StackPanel>
                             <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
                                 <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource AccentBrush}" Text="↓ Download" />
@@ -195,8 +195,8 @@
                     <StackPanel Spacing="10">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="2">
-                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="VPN-клиенты онлайн" />
-                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Количество активных WireGuard / AmneziaWG клиентов" />
+                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Loc.History.OnlineClients}" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.History.OnlineClientsDescription}" />
                             </StackPanel>
                             <TextBlock
                                 Grid.Column="1"

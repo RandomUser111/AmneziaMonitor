@@ -2,7 +2,7 @@
     x:Class="AmneziaDashboard.App.Views.DeleteServerWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Удалить сервер"
+    Title="{DynamicResource Loc.DeleteServer.Title}"
     Width="430"
     Height="235"
     CanResize="False"
@@ -16,11 +16,11 @@
             <TextBlock
                 FontSize="21"
                 FontWeight="SemiBold"
-                Text="Удалить сохранённый сервер?" />
+                Text="{DynamicResource Loc.DeleteServer.Question}" />
             <TextBlock
                 FontSize="12"
                 Foreground="{DynamicResource TextSecondaryBrush}"
-                Text="VPN-сервер и его Docker-контейнеры затронуты не будут." />
+                Text="{DynamicResource Loc.DeleteServer.SafeNote}" />
         </StackPanel>
 
         <Border
@@ -44,7 +44,7 @@
                     Margin="0,5,0,0"
                     FontSize="11"
                     Foreground="{DynamicResource TextMutedBrush}"
-                    Text="Профиль и сохранённый SSH-пароль будут удалены только с этого компьютера." />
+                    Text="{DynamicResource Loc.DeleteServer.LocalOnly}" />
             </StackPanel>
         </Border>
 
@@ -54,7 +54,7 @@
                 Width="90"
                 Height="36"
                 Click="CancelButton_Click"
-                Content="Отмена" />
+                Content="{DynamicResource Loc.Common.Cancel}" />
             <Button
                 Grid.Column="2"
                 Width="100"
@@ -63,7 +63,7 @@
                 Foreground="White"
                 FontWeight="SemiBold"
                 Click="DeleteButton_Click"
-                Content="Удалить" />
+                Content="{DynamicResource Loc.Common.Delete}" />
         </Grid>
     </Grid>
 </Window>

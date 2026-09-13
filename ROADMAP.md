@@ -1,16 +1,28 @@
 # Roadmap
 
-Version 1.0 is feature-complete for the initial goal: convenient monitoring of self-hosted Amnezia servers plus WireGuard/AmneziaWG client management.
+Amnezia Monitor 1.4 covers the original desktop-monitor goal plus background operation, desktop notifications and portable full-server backup/migration.
 
-Potential post-1.0 work:
+## Completed
 
-## High value
+- Multi-server monitoring and quick switching.
+- WireGuard / AmneziaWG client management.
+- History charts and event journal.
+- Per-client traffic statistics with selectable periods.
+- English / Russian UI.
+- System tray and background monitoring.
+- Desktop notifications for connection and protocol state changes.
+- Portable full Amnezia backup/restore/migration workflow.
+- Signed Windows release pipeline and x64 installer.
+- Linux `.deb` and `.rpm` package generation.
+- Automatic stable-release update checking.
 
-- System tray mode and background monitoring.
-- Desktop notifications for server disconnects, protocol failures and unusual client state changes.
-- Full server-side Amnezia configuration backup/restore workflow.
-- SSH private-key authentication and agent support.
+## High value next
+
+- SSH private-key authentication and SSH agent support.
 - Connection diagnostics page: SSH, Docker, ports, DNS, interfaces, routes and protocol health checks.
+- Configurable alert thresholds for CPU/RAM/disk, offline clients and protocol failures.
+- Backup inspection, scheduled backups and backup encryption.
+- Optional migration assistant for DNS/floating-IP endpoint cutover.
 
 ## Protocol coverage
 
@@ -18,16 +30,7 @@ Potential post-1.0 work:
 - XRay client lifecycle management.
 - Improved statistics for non-WireGuard protocols where upstream data is available.
 
-## Distribution
-
-- Signed Windows releases.
-- Windows installer (MSIX/installer executable).
-- Linux `.deb` and `.rpm` packages.
-- Automatic update checking.
-
 ## UX
 
-- System tray quick server switch.
-- Custom alert thresholds for CPU/RAM/disk and client counts.
 - Export/import of non-secret application settings.
-- Localization beyond Russian UI where useful.
+- More interface languages.

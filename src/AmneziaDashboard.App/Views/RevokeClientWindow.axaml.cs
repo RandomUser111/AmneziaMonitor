@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class RevokeClientWindow : Window

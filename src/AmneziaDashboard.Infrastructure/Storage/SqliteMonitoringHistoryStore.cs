@@ -90,6 +90,79 @@ public sealed class SqliteMonitoringHistoryStore : IMonitoringHistoryStore
         }
     }
 
+    public async Task AppendClientTrafficAsync(
+        IReadOnlyList<ClientTrafficHistoryRecord> records,
+        CancellationToken cancellationToken = default)
+    {
+        if (records.Count == 0)
+            return;
+
+        await _gate.WaitAsync(cancellationToken);
+        try
+        {
+            await EnsureInitializedAsync(cancellationToken);
+
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync(cancellationToken);
+            await using var transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
+
+            foreach (var record in records)
+            {
+                await using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = """
+                    INSERT INTO client_traffic_samples (
+                        server_key,
+                        captured_at_utc,
+                        client_key,
+                        client_id,
+                        client_name,
+                        container_name,
+                        protocol_name,
+                        allowed_ips,
+                        download_total_bytes,
+                        upload_total_bytes,
+                        download_delta_bytes,
+                        upload_delta_bytes)
+                    VALUES (
+                        $serverKey,
+                        $capturedAt,
+                        $clientKey,
+                        $clientId,
+                        $clientName,
+                        $containerName,
+                        $protocolName,
+                        $allowedIps,
+                        $downloadTotal,
+                        $uploadTotal,
+                        $downloadDelta,
+                        $uploadDelta);
+                    """;
+
+                command.Parameters.AddWithValue("$serverKey", record.ServerKey);
+                command.Parameters.AddWithValue("$capturedAt", record.CapturedAt.UtcDateTime.ToString("O"));
+                command.Parameters.AddWithValue("$clientKey", record.ClientKey);
+                command.Parameters.AddWithValue("$clientId", record.ClientId);
+                command.Parameters.AddWithValue("$clientName", record.ClientName);
+                command.Parameters.AddWithValue("$containerName", record.ContainerName);
+                command.Parameters.AddWithValue("$protocolName", record.ProtocolName);
+                command.Parameters.AddWithValue("$allowedIps", record.AllowedIps);
+                command.Parameters.AddWithValue("$downloadTotal", record.DownloadTotalBytes);
+                command.Parameters.AddWithValue("$uploadTotal", record.UploadTotalBytes);
+                command.Parameters.AddWithValue("$downloadDelta", record.DownloadDeltaBytes);
+                command.Parameters.AddWithValue("$uploadDelta", record.UploadDeltaBytes);
+
+                await command.ExecuteNonQueryAsync(cancellationToken);
+            }
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     public async Task<IReadOnlyList<MonitoringHistoryRecord>> GetRangeAsync(
         string serverKey,
         DateTimeOffset from,
@@ -168,6 +241,110 @@ public sealed class SqliteMonitoringHistoryStore : IMonitoringHistoryStore
         }
     }
 
+    public async Task<IReadOnlyList<ClientTrafficSummary>> GetClientTrafficSummaryAsync(
+        string serverKey,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(serverKey))
+            return [];
+
+        await _gate.WaitAsync(cancellationToken);
+        try
+        {
+            await EnsureInitializedAsync(cancellationToken);
+
+            await using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync(cancellationToken);
+
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                WITH filtered AS (
+                    SELECT *
+                    FROM client_traffic_samples
+                    WHERE server_key = $serverKey
+                      AND captured_at_utc >= $from
+                      AND captured_at_utc <= $to
+                ),
+                ranked AS (
+                    SELECT
+                        *,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY client_key
+                            ORDER BY captured_at_utc DESC, id DESC) AS rn
+                    FROM filtered
+                ),
+                totals AS (
+                    SELECT
+                        client_key,
+                        SUM(download_delta_bytes) AS download_bytes,
+                        SUM(upload_delta_bytes) AS upload_bytes,
+                        COUNT(*) AS sample_count,
+                        MIN(captured_at_utc) AS first_sample,
+                        MAX(captured_at_utc) AS last_sample
+                    FROM filtered
+                    GROUP BY client_key
+                )
+                SELECT
+                    t.client_key,
+                    r.client_id,
+                    r.client_name,
+                    r.container_name,
+                    r.protocol_name,
+                    r.allowed_ips,
+                    t.download_bytes,
+                    t.upload_bytes,
+                    t.sample_count,
+                    t.first_sample,
+                    t.last_sample
+                FROM totals t
+                INNER JOIN ranked r
+                    ON r.client_key = t.client_key
+                   AND r.rn = 1
+                ORDER BY (t.download_bytes + t.upload_bytes) DESC,
+                         r.client_name COLLATE NOCASE ASC;
+                """;
+
+            command.Parameters.AddWithValue("$serverKey", serverKey);
+            command.Parameters.AddWithValue("$from", from.UtcDateTime.ToString("O"));
+            command.Parameters.AddWithValue("$to", to.UtcDateTime.ToString("O"));
+
+            var result = new List<ClientTrafficSummary>();
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                if (!DateTimeOffset.TryParse(reader.GetString(9), out var firstSample) ||
+                    !DateTimeOffset.TryParse(reader.GetString(10), out var lastSample))
+                {
+                    continue;
+                }
+
+                result.Add(new ClientTrafficSummary
+                {
+                    ClientKey = reader.GetString(0),
+                    ClientId = reader.GetString(1),
+                    ClientName = reader.GetString(2),
+                    ContainerName = reader.GetString(3),
+                    ProtocolName = reader.GetString(4),
+                    AllowedIps = reader.GetString(5),
+                    DownloadBytes = reader.GetInt64(6),
+                    UploadBytes = reader.GetInt64(7),
+                    SampleCount = checked((int)reader.GetInt64(8)),
+                    FirstSampleAt = firstSample,
+                    LastSampleAt = lastSample
+                });
+            }
+
+            return result;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     public async Task CleanupOlderThanAsync(
         DateTimeOffset cutoff,
         CancellationToken cancellationToken = default)
@@ -181,7 +358,10 @@ public sealed class SqliteMonitoringHistoryStore : IMonitoringHistoryStore
             await connection.OpenAsync(cancellationToken);
 
             await using var command = connection.CreateCommand();
-            command.CommandText = "DELETE FROM monitoring_samples WHERE captured_at_utc < $cutoff;";
+            command.CommandText = """
+                DELETE FROM monitoring_samples WHERE captured_at_utc < $cutoff;
+                DELETE FROM client_traffic_samples WHERE captured_at_utc < $cutoff;
+                """;
             command.Parameters.AddWithValue("$cutoff", cutoff.UtcDateTime.ToString("O"));
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
@@ -219,6 +399,28 @@ public sealed class SqliteMonitoringHistoryStore : IMonitoringHistoryStore
 
             CREATE INDEX IF NOT EXISTS ix_monitoring_samples_server_time
                 ON monitoring_samples(server_key, captured_at_utc);
+
+            CREATE TABLE IF NOT EXISTS client_traffic_samples (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                server_key TEXT NOT NULL,
+                captured_at_utc TEXT NOT NULL,
+                client_key TEXT NOT NULL,
+                client_id TEXT NOT NULL,
+                client_name TEXT NOT NULL,
+                container_name TEXT NOT NULL,
+                protocol_name TEXT NOT NULL,
+                allowed_ips TEXT NOT NULL,
+                download_total_bytes INTEGER NOT NULL,
+                upload_total_bytes INTEGER NOT NULL,
+                download_delta_bytes INTEGER NOT NULL,
+                upload_delta_bytes INTEGER NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS ix_client_traffic_server_time
+                ON client_traffic_samples(server_key, captured_at_utc);
+
+            CREATE INDEX IF NOT EXISTS ix_client_traffic_server_client_time
+                ON client_traffic_samples(server_key, client_key, captured_at_utc);
             """;
 
         await command.ExecuteNonQueryAsync(cancellationToken);

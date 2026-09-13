@@ -14,6 +14,8 @@ namespace AmneziaDashboard.App.ViewModels;
 
 public partial class LogsViewModel : ViewModelBase
 {
+    private static readonly string[] CategoryKeys = ["All", "SSH", "Monitoring", "Servers", "Clients", "Protocols", "Docker"];
+
     private readonly DashboardViewModel _dashboard;
     private readonly AppEventLogService _eventLog;
     private readonly IDockerLogService _dockerLogService;
@@ -32,7 +34,9 @@ public partial class LogsViewModel : ViewModelBase
     private decimal _tailLines = 200;
 
     [ObservableProperty]
-    private string _dockerLogs = "Выберите контейнер и нажмите «Обновить».";
+    private string _dockerLogs = LocalizationService.T(
+        "Select a container and click Refresh.",
+        "Выберите контейнер и нажмите «Обновить».");
 
     [ObservableProperty]
     private string _dockerStatus = string.Empty;
@@ -49,8 +53,8 @@ public partial class LogsViewModel : ViewModelBase
         _eventLog = eventLog;
         _dockerLogService = dockerLogService;
 
-        Categories = ["Все", "SSH", "Мониторинг", "Серверы", "Клиенты", "Протоколы", "Docker"];
-
+        RefreshCategories();
+        LocalizationService.LanguageChanged += LocalizationServiceOnLanguageChanged;
         _eventLog.Entries.CollectionChanged += EntriesOnCollectionChanged;
         _dashboard.Protocols.CollectionChanged += ProtocolsOnCollectionChanged;
         _dashboard.PropertyChanged += DashboardOnPropertyChanged;
@@ -61,7 +65,7 @@ public partial class LogsViewModel : ViewModelBase
 
     public ObservableCollection<AppLogEntry> FilteredEvents { get; } = [];
 
-    public IReadOnlyList<string> Categories { get; }
+    public ObservableCollection<string> Categories { get; } = [];
 
     public ObservableCollection<ProtocolStatusViewModel> Containers => _dashboard.Protocols;
 
@@ -77,7 +81,7 @@ public partial class LogsViewModel : ViewModelBase
         _dashboard.IsConnected && SelectedContainer is not null && !IsDockerBusy;
 
     public string ServerText => _dashboard.CurrentConnection is null
-        ? "Сервер не подключён"
+        ? LocalizationService.T("Server not connected", "Сервер не подключён")
         : $"{_dashboard.CurrentConnection.Name} · {_dashboard.CurrentConnection.Host}";
 
     public void ClearEvents()
@@ -93,18 +97,20 @@ public partial class LogsViewModel : ViewModelBase
 
         if (connection is null)
         {
-            DockerStatus = "Сначала подключитесь к серверу.";
+            DockerStatus = LocalizationService.T("Connect to a server first.", "Сначала подключитесь к серверу.");
             return;
         }
 
         if (container is null)
         {
-            DockerStatus = "Выберите Docker-контейнер.";
+            DockerStatus = LocalizationService.T("Select a Docker container.", "Выберите Docker-контейнер.");
             return;
         }
 
         IsDockerBusy = true;
-        DockerStatus = $"Чтение последних {(int)TailLines} строк {container.ContainerName}…";
+        DockerStatus = LocalizationService.T(
+            $"Reading the last {(int)TailLines} lines from {container.ContainerName}…",
+            $"Чтение последних {(int)TailLines} строк {container.ContainerName}…");
 
         try
         {
@@ -116,31 +122,43 @@ public partial class LogsViewModel : ViewModelBase
             if (result.Success)
             {
                 DockerLogs = string.IsNullOrWhiteSpace(result.Content)
-                    ? "Docker logs пуст."
+                    ? LocalizationService.T("Docker logs are empty.", "Docker logs пуст.")
                     : result.Content;
 
                 var driverSuffix = string.IsNullOrWhiteSpace(result.LoggingDriver)
                     ? string.Empty
                     : $" · driver: {result.LoggingDriver}";
 
-                DockerStatus = $"Обновлено {DateTime.Now:HH:mm:ss} · {container.ContainerName}{driverSuffix}";
-                _eventLog.Info("Docker", $"Прочитан журнал контейнера {container.ContainerName}.");
+                DockerStatus = LocalizationService.T(
+                    $"Updated {DateTime.Now:HH:mm:ss} · {container.ContainerName}{driverSuffix}",
+                    $"Обновлено {DateTime.Now:HH:mm:ss} · {container.ContainerName}{driverSuffix}");
+                _eventLog.Info("Docker", LocalizationService.T(
+                    $"Read logs for container {container.ContainerName}.",
+                    $"Прочитан журнал контейнера {container.ContainerName}."));
             }
             else if (result.IsUnavailable)
             {
-                DockerLogs = result.ErrorMessage;
+                DockerLogs = LocalizationService.TranslateExternalMessage(result.ErrorMessage);
 
                 var driverSuffix = string.IsNullOrWhiteSpace(result.LoggingDriver)
                     ? string.Empty
                     : $" · driver: {result.LoggingDriver}";
 
-                DockerStatus = $"Docker logs недоступны{driverSuffix}";
-                _eventLog.Warning("Docker", $"Журнал {container.ContainerName} недоступен: {result.ErrorMessage}");
+                DockerStatus = LocalizationService.T(
+                    $"Docker logs unavailable{driverSuffix}",
+                    $"Docker logs недоступны{driverSuffix}");
+                _eventLog.Warning("Docker", LocalizationService.T(
+                    $"Logs for {container.ContainerName} are unavailable: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}",
+                    $"Журнал {container.ContainerName} недоступен: {result.ErrorMessage}"));
             }
             else
             {
-                DockerStatus = $"Ошибка: {result.ErrorMessage}";
-                _eventLog.Error("Docker", $"Не удалось прочитать {container.ContainerName}: {result.ErrorMessage}");
+                DockerStatus = LocalizationService.T(
+                    $"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}",
+                    $"Ошибка: {result.ErrorMessage}");
+                _eventLog.Error("Docker", LocalizationService.T(
+                    $"Could not read {container.ContainerName}: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}",
+                    $"Не удалось прочитать {container.ContainerName}: {result.ErrorMessage}"));
             }
         }
         finally
@@ -163,6 +181,27 @@ public partial class LogsViewModel : ViewModelBase
     }
 
     partial void OnIsDockerBusyChanged(bool value) => OnPropertyChanged(nameof(CanReadDockerLogs));
+
+    private void LocalizationServiceOnLanguageChanged(object? sender, EventArgs e)
+    {
+        RefreshCategories();
+        OnPropertyChanged(nameof(ServerText));
+        RebuildEvents();
+    }
+
+    private void RefreshCategories()
+    {
+        var selected = Math.Clamp(CategoryFilterIndex, 0, CategoryKeys.Length - 1);
+        Categories.Clear();
+        Categories.Add(LocalizationService.T("All", "Все"));
+        Categories.Add("SSH");
+        Categories.Add(LocalizationService.T("Monitoring", "Мониторинг"));
+        Categories.Add(LocalizationService.T("Servers", "Серверы"));
+        Categories.Add(LocalizationService.T("Clients", "Клиенты"));
+        Categories.Add(LocalizationService.T("Protocols", "Протоколы"));
+        Categories.Add("Docker");
+        CategoryFilterIndex = selected;
+    }
 
     private void EntriesOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => RebuildEvents();
 
@@ -201,21 +240,21 @@ public partial class LogsViewModel : ViewModelBase
     private void RebuildEvents()
     {
         var query = SearchText.Trim();
-        var category = CategoryFilterIndex >= 0 && CategoryFilterIndex < Categories.Count
-            ? Categories[CategoryFilterIndex]
-            : "Все";
+        var categoryKey = CategoryFilterIndex >= 0 && CategoryFilterIndex < CategoryKeys.Length
+            ? CategoryKeys[CategoryFilterIndex]
+            : "All";
 
         var events = _eventLog.Entries.Where(entry =>
         {
-            if (category != "Все" && !entry.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+            if (categoryKey != "All" && !AppEventLogService.NormalizeCategory(entry.Category).Equals(categoryKey, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             if (string.IsNullOrWhiteSpace(query))
                 return true;
 
             return entry.Message.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
-                   entry.Category.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
-                   entry.Level.Contains(query, StringComparison.CurrentCultureIgnoreCase);
+                   entry.CategoryText.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
+                   entry.LevelText.Contains(query, StringComparison.CurrentCultureIgnoreCase);
         });
 
         FilteredEvents.Clear();

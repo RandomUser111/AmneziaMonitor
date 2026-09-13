@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class RenameClientWindow : Window
@@ -31,7 +32,7 @@ public partial class RenameClientWindow : Window
         var value = NameTextBox.Text?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(value))
         {
-            ErrorTextBlock.Text = "Введите имя клиента.";
+            ErrorTextBlock.Text = LocalizationService.T("Enter a client name.", "Введите имя клиента.");
             return;
         }
 

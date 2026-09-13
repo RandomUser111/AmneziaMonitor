@@ -2,7 +2,7 @@
     x:Class="AmneziaDashboard.App.Views.RenameClientWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Переименовать клиента"
+    Title="{DynamicResource Loc.Clients.Rename}"
     Width="420"
     Height="220"
     CanResize="False"
@@ -16,14 +16,14 @@
             <TextBlock
                 FontSize="21"
                 FontWeight="SemiBold"
-                Text="Переименовать клиента" />
+                Text="{DynamicResource Loc.Clients.Rename}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="6">
             <TextBlock
                 FontSize="12"
                 Foreground="{DynamicResource TextSecondaryBrush}"
-                Text="Новое имя" />
+                Text="{DynamicResource Loc.Rename.NewName}" />
             <TextBox
                 x:Name="NameTextBox"
                 Height="38"
@@ -45,7 +45,7 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Click="CancelButton_Click"
-                Content="Отмена" />
+                Content="{DynamicResource Loc.Common.Cancel}" />
             <Button
                 Grid.Column="2"
                 Width="110"
@@ -56,7 +56,7 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Click="SaveButton_Click"
-                Content="Сохранить" />
+                Content="{DynamicResource Loc.Common.Save}" />
         </Grid>
     </Grid>
 </Window>

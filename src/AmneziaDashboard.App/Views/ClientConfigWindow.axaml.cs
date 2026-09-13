@@ -8,6 +8,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using QRCoder;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class ClientConfigWindow : Window
@@ -17,7 +18,7 @@ public partial class ClientConfigWindow : Window
     private bool _profileHandled;
 
     public ClientConfigWindow()
-        : this("Клиент", string.Empty, string.Empty)
+        : this(LocalizationService.T("Client", "Клиент"), string.Empty, string.Empty)
     {
     }
 
@@ -29,8 +30,8 @@ public partial class ClientConfigWindow : Window
         _configText = configText;
 
         TitleText.Text = isRestored
-            ? $"Конфигурация «{_clientName}» восстановлена"
-            : $"Клиент «{_clientName}» создан";
+            ? LocalizationService.T($"Configuration for \"{_clientName}\" restored", $"Конфигурация «{_clientName}» восстановлена")
+            : LocalizationService.T($"Client \"{_clientName}\" created", $"Клиент «{_clientName}» создан");
         AddressText.Text = string.IsNullOrWhiteSpace(clientAddress)
             ? string.Empty
             : $"VPN IP: {clientAddress}";
@@ -44,7 +45,7 @@ public partial class ClientConfigWindow : Window
                 return;
 
             e.Cancel = true;
-            StatusText.Text = "Сначала скопируйте или сохраните профиль — после закрытия приватный ключ будет потерян.";
+            StatusText.Text = LocalizationService.T("Copy or save the profile first — after the window is closed, the private key will be lost.", "Сначала скопируйте или сохраните профиль — после закрытия приватный ключ будет потерян.");
         };
     }
 
@@ -68,7 +69,7 @@ public partial class ClientConfigWindow : Window
         catch
         {
             QrPanel.IsVisible = false;
-            StatusText.Text = "Не удалось сформировать QR-код. Профиль можно сохранить как .conf.";
+            StatusText.Text = LocalizationService.T("Could not generate a QR code. You can save the profile as a .conf file.", "Не удалось сформировать QR-код. Профиль можно сохранить как .conf.");
         }
     }
 
@@ -77,13 +78,13 @@ public partial class ClientConfigWindow : Window
         var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
         if (clipboard is null)
         {
-            StatusText.Text = "Буфер обмена недоступен.";
+            StatusText.Text = LocalizationService.T("Clipboard is unavailable.", "Буфер обмена недоступен.");
             return;
         }
 
         await clipboard.SetTextAsync(_configText);
         _profileHandled = true;
-        StatusText.Text = "Скопировано. Теперь окно можно закрыть.";
+        StatusText.Text = LocalizationService.T("Copied. You can now close the window.", "Скопировано. Теперь окно можно закрыть.");
     }
 
     private async void SaveButton_Click(object? sender, RoutedEventArgs e)
@@ -91,7 +92,7 @@ public partial class ClientConfigWindow : Window
         var topLevel = TopLevel.GetTopLevel(this);
         if (topLevel?.StorageProvider is null)
         {
-            StatusText.Text = "Диалог сохранения недоступен.";
+            StatusText.Text = LocalizationService.T("The save dialog is unavailable.", "Диалог сохранения недоступен.");
             return;
         }
 
@@ -100,7 +101,7 @@ public partial class ClientConfigWindow : Window
 
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Сохранить VPN-конфигурацию",
+            Title = LocalizationService.T("Save VPN configuration", "Сохранить VPN-конфигурацию"),
             SuggestedFileName = $"{safeName}.conf",
             DefaultExtension = "conf",
             FileTypeChoices =
@@ -122,14 +123,14 @@ public partial class ClientConfigWindow : Window
         await writer.FlushAsync();
 
         _profileHandled = true;
-        StatusText.Text = "Файл сохранён. Теперь окно можно закрыть.";
+        StatusText.Text = LocalizationService.T("File saved. You can now close the window.", "Файл сохранён. Теперь окно можно закрыть.");
     }
 
     private void CloseButton_Click(object? sender, RoutedEventArgs e)
     {
         if (!_profileHandled && !string.IsNullOrWhiteSpace(_configText))
         {
-            StatusText.Text = "Сначала скопируйте или сохраните профиль.";
+            StatusText.Text = LocalizationService.T("Copy or save the profile first.", "Сначала скопируйте или сохраните профиль.");
             return;
         }
 

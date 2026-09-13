@@ -10,6 +10,7 @@ using AmneziaDashboard.Infrastructure.Security;
 using AmneziaDashboard.Infrastructure.Ssh;
 using AmneziaDashboard.Infrastructure.Storage;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class ConnectServerWindow : Window
@@ -87,15 +88,15 @@ public partial class ConnectServerWindow : Window
         {
             if (string.IsNullOrWhiteSpace(initialProfileId))
             {
-                vm.HeaderText = "Добавить сервер";
-                vm.DescriptionText = "Введите SSH-данные нового Amnezia VPN сервера.";
-                vm.PrimaryButtonText = "Добавить и подключиться";
+                vm.HeaderText = LocalizationService.T("Add server", "Добавить сервер");
+                vm.DescriptionText = LocalizationService.T("Enter SSH details for the new Amnezia VPN server.", "Введите SSH-данные нового Amnezia VPN сервера.");
+                vm.PrimaryButtonText = LocalizationService.T("Add and connect", "Добавить и подключиться");
             }
             else
             {
-                vm.HeaderText = "Изменить сервер";
-                vm.DescriptionText = "Измените параметры сервера и подключитесь к нему.";
-                vm.PrimaryButtonText = "Сохранить и подключиться";
+                vm.HeaderText = LocalizationService.T("Edit server", "Изменить сервер");
+                vm.DescriptionText = LocalizationService.T("Edit the server settings and connect to it.", "Измените параметры сервера и подключитесь к нему.");
+                vm.PrimaryButtonText = LocalizationService.T("Save and connect", "Сохранить и подключиться");
             }
         }
 
@@ -129,7 +130,7 @@ public partial class ConnectServerWindow : Window
             else
             {
                 vm.SetProfiles([]);
-                vm.Name = "Мой сервер";
+                vm.Name = LocalizationService.T("My server", "Мой сервер");
                 vm.Host = string.Empty;
                 vm.Port = 22;
                 vm.Username = "root";
@@ -143,7 +144,7 @@ public partial class ConnectServerWindow : Window
         }
         catch (Exception ex)
         {
-            vm.StatusMessage = $"Не удалось загрузить сохранённые серверы: {ex.Message}";
+            vm.StatusMessage = LocalizationService.T($"Could not load saved servers: {ex.Message}", $"Не удалось загрузить сохранённые серверы: {ex.Message}");
         }
     }
 
@@ -180,13 +181,13 @@ public partial class ConnectServerWindow : Window
             if (string.IsNullOrEmpty(password))
             {
                 vm.StatusMessage =
-                    "Для сохранённого сервера пароль не найден в защищённом хранилище. Введите его снова.";
+                    LocalizationService.T("The password for the saved server was not found in secure storage. Enter it again.", "Для сохранённого сервера пароль не найден в защищённом хранилище. Введите его снова.");
             }
         }
         catch (Exception ex)
         {
             vm.Password = string.Empty;
-            vm.StatusMessage = $"Не удалось прочитать сохранённый пароль: {ex.Message}";
+            vm.StatusMessage = LocalizationService.T($"Could not read the saved password: {ex.Message}", $"Не удалось прочитать сохранённый пароль: {ex.Message}");
         }
     }
 
@@ -199,24 +200,25 @@ public partial class ConnectServerWindow : Window
 
         if (string.IsNullOrWhiteSpace(vm.Host))
         {
-            vm.StatusMessage = "Введите IP-адрес или имя сервера.";
+            vm.StatusMessage = LocalizationService.T("Enter the server IP address or host name.", "Введите IP-адрес или имя сервера.");
             return;
         }
 
         if (string.IsNullOrWhiteSpace(vm.Username))
         {
-            vm.StatusMessage = "Введите имя пользователя.";
+            vm.StatusMessage = LocalizationService.T("Enter the username.", "Введите имя пользователя.");
             return;
         }
 
         if (string.IsNullOrEmpty(vm.Password))
         {
-            vm.StatusMessage = "Введите SSH-пароль.";
+            vm.StatusMessage = LocalizationService.T("Enter the SSH password.", "Введите SSH-пароль.");
             return;
         }
 
         vm.IsConnecting = true;
-        vm.StatusMessage = "Подключение к серверу...";
+        var connectingMessage = LocalizationService.T("Connecting to server...", "Подключение к серверу...");
+        vm.StatusMessage = connectingMessage;
 
         try
         {
@@ -233,7 +235,7 @@ public partial class ConnectServerWindow : Window
 
             if (!result.Success)
             {
-                vm.StatusMessage = result.ErrorMessage;
+                vm.StatusMessage = LocalizationService.TranslateExternalMessage(result.ErrorMessage);
                 return;
             }
 
@@ -270,7 +272,7 @@ public partial class ConnectServerWindow : Window
                         profile.RememberPassword = false;
                         profile.AutoConnect = false;
                         vm.StatusMessage =
-                            $"Соединение установлено, но пароль не удалось сохранить: {secretResult.ErrorMessage}";
+                            LocalizationService.T($"Connection established, but the password could not be saved: {LocalizationService.TranslateExternalMessage(secretResult.ErrorMessage)}", $"Соединение установлено, но пароль не удалось сохранить: {secretResult.ErrorMessage}");
                     }
                 }
                 else
@@ -295,16 +297,16 @@ public partial class ConnectServerWindow : Window
             ProbeResult = result;
 
             if (string.IsNullOrWhiteSpace(vm.StatusMessage) ||
-                vm.StatusMessage == "Подключение к серверу...")
+                vm.StatusMessage == connectingMessage)
             {
-                vm.StatusMessage = "Соединение установлено.";
+                vm.StatusMessage = LocalizationService.T("Connection established.", "Соединение установлено.");
             }
 
             Close(true);
         }
         catch (Exception ex)
         {
-            vm.StatusMessage = $"Ошибка: {ex.Message}";
+            vm.StatusMessage = LocalizationService.T($"Error: {ex.Message}", $"Ошибка: {ex.Message}");
         }
         finally
         {
@@ -327,12 +329,12 @@ public partial class ConnectServerWindow : Window
             var profileId = vm.SelectedProfile.Id;
             await _secretStore.DeletePasswordAsync(profileId);
             await _profileStore.DeleteAsync(profileId);
-            vm.StatusMessage = "Сохранённый сервер и его пароль удалены.";
+            vm.StatusMessage = LocalizationService.T("The saved server and its password were deleted.", "Сохранённый сервер и его пароль удалены.");
             await LoadProfilesAsync();
         }
         catch (Exception ex)
         {
-            vm.StatusMessage = $"Не удалось удалить сохранённый сервер: {ex.Message}";
+            vm.StatusMessage = LocalizationService.T($"Could not delete the saved server: {ex.Message}", $"Не удалось удалить сохранённый сервер: {ex.Message}");
         }
     }
 

@@ -14,18 +14,22 @@ public class ProtocolsViewModel : ViewModelBase
     private readonly DashboardViewModel _dashboard;
     private readonly IProtocolManagementService _protocolManagementService;
     private readonly AppEventLogService? _eventLog;
+    private readonly DesktopNotificationService? _notifications;
     private bool _isBusy;
     private string _operationStatus = string.Empty;
 
     public ProtocolsViewModel(
         DashboardViewModel dashboard,
         IProtocolManagementService protocolManagementService,
-        AppEventLogService? eventLog = null)
+        AppEventLogService? eventLog = null,
+        DesktopNotificationService? notifications = null)
     {
         _dashboard = dashboard;
         _protocolManagementService = protocolManagementService;
         _eventLog = eventLog;
+        _notifications = notifications;
         _dashboard.PropertyChanged += DashboardOnPropertyChanged;
+        LocalizationService.LanguageChanged += LocalizationServiceOnLanguageChanged;
     }
 
     public ObservableCollection<ProtocolStatusViewModel> Protocols =>
@@ -111,17 +115,17 @@ public class ProtocolsViewModel : ViewModelBase
         Func<ServerConnection, CancellationToken, Task<OperationResult>> operation)
     {
         if (IsBusy)
-            return OperationResult.Fail("Подождите завершения текущей операции.");
+            return OperationResult.Fail(LocalizationService.T("Wait for the current operation to finish.", "Подождите завершения текущей операции."));
 
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
         {
-            OperationStatus = "Сначала подключитесь к серверу.";
-            return OperationResult.Fail("Нет активного подключения к серверу.");
+            OperationStatus = LocalizationService.T("Connect to a server first.", "Сначала подключитесь к серверу.");
+            return OperationResult.Fail(LocalizationService.T("There is no active server connection.", "Нет активного подключения к серверу."));
         }
 
         IsBusy = true;
-        OperationStatus = $"Выполняется операция для {protocol.DisplayName}…";
+        OperationStatus = LocalizationService.T($"Running operation for {protocol.DisplayName}…", $"Выполняется операция для {protocol.DisplayName}…");
 
         try
         {
@@ -129,14 +133,27 @@ public class ProtocolsViewModel : ViewModelBase
 
             OperationStatus = result.Success
                 ? string.IsNullOrWhiteSpace(result.Message)
-                    ? $"Операция для {protocol.DisplayName} выполнена. Мониторинг скоро обновит статус."
-                    : result.Message
-                : $"Ошибка: {result.ErrorMessage}";
+                    ? LocalizationService.T($"Operation for {protocol.DisplayName} completed. Monitoring will update the status shortly.", $"Операция для {protocol.DisplayName} выполнена. Мониторинг скоро обновит статус.")
+                    : LocalizationService.TranslateExternalMessage(result.Message)
+                : LocalizationService.T($"Error: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"Ошибка: {result.ErrorMessage}");
 
             if (result.Success)
-                _eventLog?.Success("Протоколы", $"{protocol.DisplayName}: {OperationStatus}");
+            {
+                _eventLog?.Success("Protocols", $"{protocol.DisplayName}: {OperationStatus}");
+                _ = _notifications?.NotifyAsync(
+                    LocalizationService.T("VPN protocol operation completed", "Операция VPN-протокола завершена"),
+                    $"{protocol.DisplayName}: {OperationStatus}",
+                    DesktopNotificationKind.Information);
+            }
             else
-                _eventLog?.Error("Протоколы", $"{protocol.DisplayName}: {result.ErrorMessage}");
+            {
+                var errorText = LocalizationService.T($"{protocol.DisplayName}: {LocalizationService.TranslateExternalMessage(result.ErrorMessage)}", $"{protocol.DisplayName}: {result.ErrorMessage}");
+                _eventLog?.Error("Protocols", errorText);
+                _ = _notifications?.NotifyAsync(
+                    LocalizationService.T("VPN protocol error", "Ошибка VPN-протокола"),
+                    errorText,
+                    DesktopNotificationKind.Error);
+            }
 
             return result;
         }
@@ -144,6 +161,16 @@ public class ProtocolsViewModel : ViewModelBase
         {
             IsBusy = false;
         }
+    }
+
+
+    private void LocalizationServiceOnLanguageChanged(object? sender, EventArgs e)
+    {
+        foreach (var protocol in Protocols)
+            protocol.NotifyLocalizationChanged();
+
+        OnPropertyChanged(nameof(ServerStatus));
+        OnPropertyChanged(nameof(ProtocolsMessage));
     }
 
     private void DashboardOnPropertyChanged(

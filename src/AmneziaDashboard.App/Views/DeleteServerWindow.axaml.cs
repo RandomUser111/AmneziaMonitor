@@ -1,12 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App.Views;
 
 public partial class DeleteServerWindow : Window
 {
     public DeleteServerWindow()
-        : this("Сервер", string.Empty)
+        : this(LocalizationService.T("Server", "Сервер"), string.Empty)
     {
     }
 

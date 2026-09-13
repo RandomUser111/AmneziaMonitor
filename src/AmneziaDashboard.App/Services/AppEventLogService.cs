@@ -26,13 +26,13 @@ public sealed class AppEventLogService
         LoadRecent();
     }
 
-    public void Info(string category, string message) => Add("Инфо", category, message);
+    public void Info(string category, string message) => Add("Info", category, message);
 
-    public void Success(string category, string message) => Add("Успех", category, message);
+    public void Success(string category, string message) => Add("Success", category, message);
 
-    public void Warning(string category, string message) => Add("Внимание", category, message);
+    public void Warning(string category, string message) => Add("Warning", category, message);
 
-    public void Error(string category, string message) => Add("Ошибка", category, message);
+    public void Error(string category, string message) => Add("Error", category, message);
 
     public void Clear()
     {
@@ -48,7 +48,7 @@ public sealed class AppEventLogService
             }
             catch
             {
-                // Журнал не должен мешать работе приложения.
+                // Logging must never interfere with the application.
             }
         }
 
@@ -64,7 +64,7 @@ public sealed class AppEventLogService
         {
             Timestamp = DateTimeOffset.Now,
             Level = level,
-            Category = category,
+            Category = NormalizeCategory(category),
             Message = message
         };
 
@@ -77,7 +77,7 @@ public sealed class AppEventLogService
         }
         catch
         {
-            // Локальный журнал не должен ломать основную функциональность.
+            // Local logging must not break primary functionality.
         }
 
         var entry = AppLogEntry.Create(dto.Timestamp, dto.Level, dto.Category, dto.Message);
@@ -122,12 +122,52 @@ public sealed class AppEventLogService
                 .ToList();
 
             foreach (var record in records)
-                Entries.Add(AppLogEntry.Create(record.Timestamp, record.Level, record.Category, record.Message));
+            {
+                Entries.Add(AppLogEntry.Create(
+                    record.Timestamp,
+                    NormalizeLevel(record.Level),
+                    NormalizeCategory(record.Category),
+                    record.Message));
+            }
         }
         catch
         {
-            // Поврежденный журнал можно просто начать заново отображать с текущей сессии.
+            // A damaged local log can be ignored; the current session can start a new one.
         }
+    }
+
+    public static string NormalizeCategory(string? category)
+    {
+        return category?.Trim() switch
+        {
+            "Мониторинг" => "Monitoring",
+            "Серверы" => "Servers",
+            "Клиенты" => "Clients",
+            "Протоколы" => "Protocols",
+            "Docker" => "Docker",
+            "SSH" => "SSH",
+            "Monitoring" => "Monitoring",
+            "Servers" => "Servers",
+            "Clients" => "Clients",
+            "Protocols" => "Protocols",
+            _ => category?.Trim() ?? string.Empty
+        };
+    }
+
+    private static string NormalizeLevel(string? level)
+    {
+        return level?.Trim() switch
+        {
+            "Инфо" => "Info",
+            "Успех" => "Success",
+            "Внимание" => "Warning",
+            "Ошибка" => "Error",
+            "Info" => "Info",
+            "Success" => "Success",
+            "Warning" => "Warning",
+            "Error" => "Error",
+            _ => "Info"
+        };
     }
 
     private sealed class AppLogRecord
@@ -151,13 +191,30 @@ public sealed class AppLogEntry
     public string Category { get; init; } = string.Empty;
     public string Message { get; init; } = string.Empty;
 
-    public string TimeText => Timestamp.ToString("dd.MM.yyyy HH:mm:ss");
+    public string TimeText => Timestamp.ToString("g");
+
+    public string LevelText => Level switch
+    {
+        "Success" => LocalizationService.T("Success", "Успех"),
+        "Warning" => LocalizationService.T("Warning", "Внимание"),
+        "Error" => LocalizationService.T("Error", "Ошибка"),
+        _ => LocalizationService.T("Info", "Инфо")
+    };
+
+    public string CategoryText => Category switch
+    {
+        "Monitoring" => LocalizationService.T("Monitoring", "Мониторинг"),
+        "Servers" => LocalizationService.T("Servers", "Серверы"),
+        "Clients" => LocalizationService.T("Clients", "Клиенты"),
+        "Protocols" => LocalizationService.T("Protocols", "Протоколы"),
+        _ => Category
+    };
 
     public IBrush LevelBrush => Level switch
     {
-        "Успех" => SuccessBrush,
-        "Внимание" => WarningBrush,
-        "Ошибка" => ErrorBrush,
+        "Success" => SuccessBrush,
+        "Warning" => WarningBrush,
+        "Error" => ErrorBrush,
         _ => InfoBrush
     };
 

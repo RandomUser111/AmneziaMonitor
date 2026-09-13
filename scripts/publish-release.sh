@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${1:-1.0.2}"
+VERSION="${1:-1.4.0}"
 MODE="${2:-compact}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT/src/AmneziaDashboard.App/AmneziaDashboard.App.csproj"

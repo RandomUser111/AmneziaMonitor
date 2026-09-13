@@ -3,7 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:AmneziaDashboard.App.ViewModels"
-    Title="Новый клиент"
+    Title="{DynamicResource Loc.Clients.NewClient}"
     Width="430"
     Height="320"
     CanResize="False"
@@ -14,22 +14,22 @@
 
     <Grid Margin="22" RowDefinitions="Auto,*,Auto">
         <StackPanel Spacing="4">
-            <TextBlock FontSize="22" FontWeight="SemiBold" Text="Новый VPN-клиент" />
+            <TextBlock FontSize="22" FontWeight="SemiBold" Text="{DynamicResource Loc.CreateClient.Title}" />
         </StackPanel>
 
         <StackPanel Grid.Row="1" Margin="0,22,0,0" Spacing="14">
             <StackPanel Spacing="5">
-                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="Имя клиента" />
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.CreateClient.Name}" />
                 <TextBox
                     x:Name="ClientNameBox"
                     Height="38"
                     VerticalContentAlignment="Center"
-                    PlaceholderText="Например: Ноутбук"
+                    PlaceholderText="{DynamicResource Loc.CreateClient.NamePlaceholder}"
                     MaxLength="100" />
             </StackPanel>
 
             <StackPanel Spacing="5">
-                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="Протокол" />
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="{DynamicResource Loc.Common.Protocol}" />
                 <ComboBox
                     x:Name="ProtocolBox"
                     Height="38"
@@ -66,7 +66,7 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Click="CancelButton_Click"
-                Content="Отмена" />
+                Content="{DynamicResource Loc.Common.Cancel}" />
 
             <Button
                 Grid.Column="2"
@@ -78,7 +78,7 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Click="CreateButton_Click"
-                Content="Создать" />
+                Content="{DynamicResource Loc.Common.Create}" />
         </Grid>
     </Grid>
 </Window>

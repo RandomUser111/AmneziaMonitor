@@ -13,12 +13,12 @@
                 <TextBlock
                     FontSize="28"
                     FontWeight="SemiBold"
-                    Text="Настройки" />
+                    Text="{DynamicResource Loc.Nav.Settings}" />
 
                 <TextBlock
                     FontSize="13"
                     Foreground="{DynamicResource TextSecondaryBrush}"
-                    Text="Параметры Amnezia Monitor" />
+                    Text="{DynamicResource Loc.Settings.Subtitle}" />
             </StackPanel>
 
             <Border
@@ -34,11 +34,11 @@
                             <TextBlock
                                 FontSize="14"
                                 FontWeight="SemiBold"
-                                Text="Тема оформления" />
+                                Text="{DynamicResource Loc.Settings.Theme}" />
                             <TextBlock
                                 FontSize="12"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
-                                Text="Переключение применяется сразу ко всему приложению." />
+                                Text="{DynamicResource Loc.Settings.ThemeDescription}" />
                         </StackPanel>
 
                         <TextBlock
@@ -53,19 +53,117 @@
                             Height="36"
                             Padding="14,0"
                             Command="{Binding SetLightThemeCommand}"
-                            Content="Светлая" />
+                            Content="{DynamicResource Loc.Settings.Light}" />
 
                         <Button
                             Height="36"
                             Padding="14,0"
                             Command="{Binding SetDarkThemeCommand}"
-                            Content="Тёмная" />
+                            Content="{DynamicResource Loc.Settings.Dark}" />
 
                         <Button
                             Height="36"
                             Padding="14,0"
                             Command="{Binding SetSystemThemeCommand}"
-                            Content="Как в системе" />
+                            Content="{DynamicResource Loc.Settings.System}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="{DynamicResource Loc.Settings.Language}" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="{DynamicResource Loc.Settings.LanguageDescription}" />
+                        </StackPanel>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{Binding CurrentLanguage}" />
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            Command="{Binding SetEnglishLanguageCommand}"
+                            Content="English" />
+
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            Command="{Binding SetRussianLanguageCommand}"
+                            Content="Русский" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel Spacing="10">
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Loc.Settings.DesktopIntegration}" />
+                    <CheckBox IsChecked="{Binding NotificationsEnabled}" Content="{DynamicResource Loc.Settings.Notifications}" />
+                    <CheckBox IsChecked="{Binding MinimizeToTray}" Content="{DynamicResource Loc.Settings.MinimizeToTray}" />
+                    <CheckBox IsChecked="{Binding CloseToTray}" Content="{DynamicResource Loc.Settings.CloseToTray}" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{DynamicResource Loc.Settings.TrayDescription}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel Spacing="10">
+                    <TextBlock FontSize="14" FontWeight="SemiBold" Text="{DynamicResource Loc.Settings.Updates}" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{DynamicResource Loc.Settings.UpdatesDescription}"
+                        TextWrapping="Wrap" />
+                    <CheckBox IsChecked="{Binding AutomaticUpdateChecks}" Content="{DynamicResource Loc.Settings.AutomaticUpdateChecks}" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding UpdateStatus}"
+                        TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            IsEnabled="{Binding CanCheckForUpdates}"
+                            Command="{Binding CheckForUpdatesCommand}"
+                            Content="{DynamicResource Loc.Settings.CheckForUpdates}" />
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            IsVisible="{Binding CanOpenUpdate}"
+                            Command="{Binding OpenUpdatePageCommand}"
+                            Content="{DynamicResource Loc.Update.ViewRelease}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -80,11 +178,11 @@
                     <TextBlock
                         FontSize="14"
                         FontWeight="SemiBold"
-                        Text="Хранение настроек" />
+                        Text="{DynamicResource Loc.Settings.Storage}" />
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource TextSecondaryBrush}"
-                        Text="Профили серверов сохраняются локально. SSH-пароли хранятся только в системном защищённом хранилище: Windows Credential Manager или Linux Secret Service."
+                        Text="{DynamicResource Loc.Settings.StorageDescription}"
                         TextWrapping="Wrap" />
                 </StackPanel>
             </Border>

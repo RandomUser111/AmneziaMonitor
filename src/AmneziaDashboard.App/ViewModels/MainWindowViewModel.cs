@@ -20,8 +20,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ClientsViewModel _clientsViewModel;
     private readonly ProtocolsViewModel _protocolsViewModel;
     private readonly HistoryViewModel _historyViewModel;
+    private readonly ClientTrafficViewModel _clientTrafficViewModel;
     private readonly LogsViewModel _logsViewModel;
+    private readonly BackupViewModel _backupViewModel;
     private readonly SettingsViewModel _settingsViewModel;
+    private readonly AppUpdateService _updateService;
     private readonly ISecretStore _secretStore;
     private bool _autoConnectAttempted;
     private bool _synchronizingQuickSelection;
@@ -47,6 +50,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool IsSynchronizingQuickSelection => _synchronizingQuickSelection;
 
+    public bool IsUpdateAvailable => _updateService.IsUpdateAvailable;
+
+    public string UpdateBannerText => LocalizationService.T(
+        $"Amnezia Monitor {_updateService.LatestVersion} is available",
+        $"Доступна новая версия Amnezia Monitor {_updateService.LatestVersion}");
+
     public MainWindowViewModel()
         : this(
             new JsonServerProfileStore(),
@@ -63,11 +72,20 @@ public partial class MainWindowViewModel : ViewModelBase
         _secretStore = secretStore;
 
         var eventLog = new AppEventLogService();
+        var notifications = new DesktopNotificationService(eventLog);
+        _updateService = new AppUpdateService(notifications);
+        _updateService.StateChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(IsUpdateAvailable));
+            OnPropertyChanged(nameof(UpdateBannerText));
+        };
+        LocalizationService.LanguageChanged += (_, _) => OnPropertyChanged(nameof(UpdateBannerText));
         var historyStore = new SqliteMonitoringHistoryStore();
         _dashboardViewModel = new DashboardViewModel(
             new SshServerMonitorService(),
             historyStore,
-            eventLog);
+            eventLog,
+            notifications);
         _serversViewModel = new ServersViewModel(
             _dashboardViewModel,
             profileStore,
@@ -91,10 +109,12 @@ public partial class MainWindowViewModel : ViewModelBase
         };
 
         _clientsViewModel = new ClientsViewModel(_dashboardViewModel, new SshClientManagementService(), eventLog);
-        _protocolsViewModel = new ProtocolsViewModel(_dashboardViewModel, new SshProtocolManagementService(), eventLog);
+        _protocolsViewModel = new ProtocolsViewModel(_dashboardViewModel, new SshProtocolManagementService(), eventLog, notifications);
         _historyViewModel = new HistoryViewModel(_dashboardViewModel, historyStore);
+        _clientTrafficViewModel = new ClientTrafficViewModel(_dashboardViewModel, historyStore);
         _logsViewModel = new LogsViewModel(_dashboardViewModel, eventLog, new SshDockerLogService());
-        _settingsViewModel = new SettingsViewModel();
+        _backupViewModel = new BackupViewModel(_dashboardViewModel, new SshServerBackupService(), eventLog);
+        _settingsViewModel = new SettingsViewModel(_updateService);
         _currentPage = _dashboardViewModel;
     }
 
@@ -127,6 +147,19 @@ public partial class MainWindowViewModel : ViewModelBase
         catch
         {
             // Автоподключение не должно мешать ручному запуску приложения.
+        }
+    }
+
+    public async Task CheckForUpdatesOnStartupAsync()
+    {
+        try
+        {
+            await Task.Delay(1500);
+            await _updateService.CheckAsync(force: false);
+        }
+        catch
+        {
+            // Update checks must never block application startup.
         }
     }
 
@@ -205,9 +238,28 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task ShowClientTraffic()
+    {
+        CurrentPage = _clientTrafficViewModel;
+        await _clientTrafficViewModel.RefreshAsync();
+    }
+
+    [RelayCommand]
     private void ShowLogs()
     {
         CurrentPage = _logsViewModel;
+    }
+
+    [RelayCommand]
+    private void ShowBackup()
+    {
+        CurrentPage = _backupViewModel;
+    }
+
+    [RelayCommand]
+    private void OpenUpdateRelease()
+    {
+        _updateService.OpenReleasePage();
     }
 
     [RelayCommand]

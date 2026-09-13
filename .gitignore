@@ -14,3 +14,7 @@ artifacts/
 events.jsonl
 servers.json
 settings.json
+
+# Sensitive Amnezia Monitor backup artifacts
+*.ambackup
+*.ambackup.sha256

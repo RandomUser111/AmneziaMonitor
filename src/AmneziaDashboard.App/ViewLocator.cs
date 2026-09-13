@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using AmneziaDashboard.App.ViewModels;
 
+using AmneziaDashboard.App.Services;
 namespace AmneziaDashboard.App;
 
 public class ViewLocator : IDataTemplate
@@ -20,7 +21,7 @@ public class ViewLocator : IDataTemplate
         {
             return new TextBlock
             {
-                Text = $"Неизвестная модель: {viewModelName}"
+                Text = LocalizationService.T($"Unknown view model: {viewModelName}", $"Неизвестная модель: {viewModelName}")
             };
         }
 
@@ -40,7 +41,7 @@ public class ViewLocator : IDataTemplate
         {
             return new TextBlock
             {
-                Text = $"Представление не найдено: {fullViewName}"
+                Text = LocalizationService.T($"View not found: {fullViewName}", $"Представление не найдено: {fullViewName}")
             };
         }
 

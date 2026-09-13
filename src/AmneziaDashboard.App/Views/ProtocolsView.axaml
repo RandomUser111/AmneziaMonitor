@@ -13,12 +13,12 @@
                 <TextBlock
                     FontSize="28"
                     FontWeight="SemiBold"
-                    Text="Протоколы" />
+                    Text="{DynamicResource Loc.Nav.Protocols}" />
 
                 <TextBlock
                     FontSize="13"
                     Foreground="{DynamicResource TextSecondaryBrush}"
-                    Text="Установленные Docker-контейнеры Amnezia VPN" />
+                    Text="{DynamicResource Loc.Protocols.Subtitle}" />
             </StackPanel>
 
             <Border
@@ -33,7 +33,7 @@
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextSecondaryBrush}"
-                            Text="СИСТЕМА" />
+                            Text="{DynamicResource Loc.Protocols.System}" />
                         <TextBlock
                             FontSize="13"
                             Text="{Binding OperatingSystem}" />
@@ -144,7 +144,7 @@
                                         <TextBlock
                                             FontSize="11"
                                             Foreground="{DynamicResource TextSecondaryBrush}"
-                                            Text="ПОРТЫ" />
+                                            Text="{DynamicResource Loc.Protocols.Ports}" />
                                         <TextBlock
                                             FontSize="12"
                                             Text="{Binding PortsText}"
@@ -155,7 +155,7 @@
                                         <TextBlock
                                             FontSize="11"
                                             Foreground="{DynamicResource TextSecondaryBrush}"
-                                            Text="СТАТУС DOCKER" />
+                                            Text="{DynamicResource Loc.Protocols.DockerStatus}" />
                                         <TextBlock
                                             FontSize="12"
                                             Text="{Binding DockerStatusText}"

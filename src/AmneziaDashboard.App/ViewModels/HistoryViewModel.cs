@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AmneziaDashboard.Core.Interfaces;
 using AmneziaDashboard.Core.Models;
+using AmneziaDashboard.App.Services;
 
 namespace AmneziaDashboard.App.ViewModels;
 
@@ -14,9 +15,9 @@ public sealed class HistoryViewModel : ViewModelBase
     private readonly IMonitoringHistoryStore _historyStore;
     private int _periodIndex = 2;
     private bool _isLoading;
-    private string _statusText = "Подключитесь к серверу, чтобы увидеть историю.";
-    private string _serverTitle = "Сервер не выбран";
-    private string _periodText = "Последние 24 часа";
+    private string _statusText = LocalizationService.T("Connect to a server to view history.", "Подключитесь к серверу, чтобы увидеть историю.");
+    private string _serverTitle = LocalizationService.T("No server selected", "Сервер не выбран");
+    private string _periodText = LocalizationService.T("Last 24 hours", "Последние 24 часа");
     private string _cpuSummary = "—";
     private string _ramSummary = "—";
     private string _downloadSummary = "—";
@@ -199,7 +200,7 @@ public sealed class HistoryViewModel : ViewModelBase
         var connection = _dashboard.CurrentConnection;
         if (connection is null)
         {
-            Reset("Подключитесь к серверу, чтобы увидеть историю.");
+            Reset(LocalizationService.T("Connect to a server to view history.", "Подключитесь к серверу, чтобы увидеть историю."));
             return;
         }
 
@@ -216,14 +217,14 @@ public sealed class HistoryViewModel : ViewModelBase
 
             PeriodText = PeriodIndex switch
             {
-                0 => "Последний час",
-                1 => "Последние 6 часов",
-                2 => "Последние 24 часа",
-                _ => "Последние 7 дней"
+                0 => LocalizationService.T("Last hour", "Последний час"),
+                1 => LocalizationService.T("Last 6 hours", "Последние 6 часов"),
+                2 => LocalizationService.T("Last 24 hours", "Последние 24 часа"),
+                _ => LocalizationService.T("Last 7 days", "Последние 7 дней")
             };
 
             ServerTitle = $"{connection.Name} · {connection.Host}";
-            StatusText = "Загрузка истории…";
+            StatusText = LocalizationService.T("Loading history…", "Загрузка истории…");
 
             var now = DateTimeOffset.UtcNow;
             var records = await _historyStore.GetRangeAsync(
@@ -234,7 +235,7 @@ public sealed class HistoryViewModel : ViewModelBase
 
             if (records.Count == 0)
             {
-                Reset("История за выбранный период пока не накоплена.", preserveServer: true);
+                Reset(LocalizationService.T("No history has been collected for the selected period yet.", "История за выбранный период пока не накоплена."), preserveServer: true);
                 return;
             }
 
@@ -242,11 +243,11 @@ public sealed class HistoryViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Загрузка отменена.";
+            StatusText = LocalizationService.T("Loading cancelled.", "Загрузка отменена.");
         }
         catch (Exception ex)
         {
-            Reset($"Не удалось прочитать историю: {ex.Message}", preserveServer: true);
+            Reset(LocalizationService.T($"Could not read history: {ex.Message}", $"Не удалось прочитать историю: {ex.Message}"), preserveServer: true);
         }
         finally
         {
@@ -257,7 +258,7 @@ public sealed class HistoryViewModel : ViewModelBase
     private void ApplyRecords(IReadOnlyList<MonitoringHistoryRecord> records)
     {
         HasData = true;
-        StatusText = $"Обновлено {DateTime.Now:HH:mm:ss}";
+        StatusText = LocalizationService.T($"Updated {DateTime.Now:HH:mm:ss}", $"Обновлено {DateTime.Now:HH:mm:ss}");
 
         CpuValues = Downsample(records.Where(x => x.CpuPercent.HasValue).Select(x => x.CpuPercent!.Value));
         RamValues = Downsample(records.Where(x => x.RamPercent.HasValue).Select(x => x.RamPercent!.Value));
@@ -273,11 +274,15 @@ public sealed class HistoryViewModel : ViewModelBase
         var onlineAverage = records.Average(x => x.ClientsOnline);
         var onlineMax = records.Max(x => x.ClientsOnline);
         var totalMax = records.Max(x => x.ClientsTotal);
-        ClientsSummary = $"ср. {onlineAverage:0.#} · макс. {onlineMax} · всего до {totalMax}";
+        ClientsSummary = LocalizationService.IsRussian
+            ? $"ср. {onlineAverage:0.#} · макс. {onlineMax} · всего до {totalMax}"
+            : $"avg. {onlineAverage:0.#} · max. {onlineMax} · total up to {totalMax}";
 
         var first = records[0].CapturedAt.ToLocalTime();
         var last = records[^1].CapturedAt.ToLocalTime();
-        SampleSummary = $"{records.Count} точек · {first:dd.MM HH:mm} — {last:dd.MM HH:mm}";
+        SampleSummary = LocalizationService.IsRussian
+            ? $"{records.Count} точек · {first:dd.MM HH:mm} — {last:dd.MM HH:mm}"
+            : $"{records.Count} samples · {first:g} — {last:g}";
     }
 
     private void Reset(string status, bool preserveServer = false)
@@ -285,7 +290,7 @@ public sealed class HistoryViewModel : ViewModelBase
         HasData = false;
         StatusText = status;
         if (!preserveServer)
-            ServerTitle = "Сервер не выбран";
+            ServerTitle = LocalizationService.T("No server selected", "Сервер не выбран");
 
         CpuValues = [];
         RamValues = [];
@@ -324,7 +329,9 @@ public sealed class HistoryViewModel : ViewModelBase
         if (values.Count == 0)
             return "—";
 
-        return $"ср. {values.Average():0.#}% · макс. {values.Max():0.#}%";
+        return LocalizationService.IsRussian
+            ? $"ср. {values.Average():0.#}% · макс. {values.Max():0.#}%"
+            : $"avg. {values.Average():0.#}% · max. {values.Max():0.#}%";
     }
 
     private static string FormatRateSummary(IEnumerable<double> source)
@@ -333,13 +340,15 @@ public sealed class HistoryViewModel : ViewModelBase
         if (values.Count == 0)
             return "—";
 
-        return $"ср. {FormatRate(values.Average())} · макс. {FormatRate(values.Max())}";
+        return LocalizationService.IsRussian
+            ? $"ср. {FormatRate(values.Average())} · макс. {FormatRate(values.Max())}"
+            : $"avg. {FormatRate(values.Average())} · max. {FormatRate(values.Max())}";
     }
 
     private static string FormatRate(double bytesPerSecond)
     {
         var value = Math.Max(0, bytesPerSecond);
-        string[] units = ["Б/с", "КБ/с", "МБ/с", "ГБ/с"];
+        string[] units = LocalizationService.IsRussian ? ["Б/с", "КБ/с", "МБ/с", "ГБ/с"] : ["B/s", "KB/s", "MB/s", "GB/s"];
         var unit = 0;
 
         while (value >= 1024 && unit < units.Length - 1)

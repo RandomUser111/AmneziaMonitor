@@ -1,8 +1,7 @@
 # Amnezia Monitor
 
 <p align="center">
-  <img width="1018" height="749" alt="изображение" src="https://github.com/user-attachments/assets/2677927a-1f40-43c2-9652-25a174af2b78" />
-
+  <img width="1021" height="679" alt="изображение" src="https://github.com/user-attachments/assets/f7dca775-a406-46b7-bb05-b442022a682c" />
 </p>
 
 **Amnezia Monitor** is a cross-platform desktop application for monitoring and managing self-hosted Amnezia VPN servers over SSH.

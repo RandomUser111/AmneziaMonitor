@@ -1,0 +1,69 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.DeleteServerWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Удалить сервер"
+    Width="430"
+    Height="235"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <StackPanel Spacing="5">
+            <TextBlock
+                FontSize="21"
+                FontWeight="SemiBold"
+                Text="Удалить сохранённый сервер?" />
+            <TextBlock
+                FontSize="12"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="VPN-сервер и его Docker-контейнеры затронуты не будут." />
+        </StackPanel>
+
+        <Border
+            Grid.Row="1"
+            Margin="0,18,0,0"
+            Padding="12"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderSoftBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <StackPanel Spacing="4">
+                <TextBlock
+                    x:Name="ServerNameText"
+                    FontSize="14"
+                    FontWeight="SemiBold" />
+                <TextBlock
+                    x:Name="ServerAddressText"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextSecondaryBrush}" />
+                <TextBlock
+                    Margin="0,5,0,0"
+                    FontSize="11"
+                    Foreground="{DynamicResource TextMutedBrush}"
+                    Text="Профиль и сохранённый SSH-пароль будут удалены только с этого компьютера." />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,18,0,0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <Button
+                Grid.Column="1"
+                Width="90"
+                Height="36"
+                Click="CancelButton_Click"
+                Content="Отмена" />
+            <Button
+                Grid.Column="2"
+                Width="100"
+                Height="36"
+                Background="{DynamicResource StatusErrorBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                Click="DeleteButton_Click"
+                Content="Удалить" />
+        </Grid>
+    </Grid>
+</Window>

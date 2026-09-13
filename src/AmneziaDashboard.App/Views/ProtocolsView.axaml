@@ -1,0 +1,204 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.ProtocolsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:ProtocolsViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+
+            <StackPanel Spacing="2">
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="SemiBold"
+                    Text="Протоколы" />
+
+                <TextBlock
+                    FontSize="13"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="Установленные Docker-контейнеры Amnezia VPN" />
+            </StackPanel>
+
+            <Border
+                Padding="14"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="18">
+                    <StackPanel Spacing="3">
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="СИСТЕМА" />
+                        <TextBlock
+                            FontSize="13"
+                            Text="{Binding OperatingSystem}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="3">
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="DOCKER" />
+                        <TextBlock
+                            FontSize="13"
+                            Text="{Binding DockerVersion}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border
+                IsVisible="{Binding HasOperationStatus}"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <TextBlock
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="{Binding OperationStatus}"
+                    TextWrapping="Wrap" />
+            </Border>
+
+            <Border
+                IsVisible="{Binding HasNoProtocols}"
+                Padding="18"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <TextBlock
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="{Binding ProtocolsMessage}"
+                    TextWrapping="Wrap" />
+            </Border>
+
+            <ItemsControl
+                IsVisible="{Binding HasProtocols}"
+                ItemsSource="{Binding Protocols}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ProtocolStatusViewModel">
+                        <Border
+                            Margin="0,0,0,10"
+                            Padding="16"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderSoftBrush}"
+                            BorderThickness="1"
+                            CornerRadius="10">
+
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Foreground="{Binding StatusBrush}"
+                                        FontSize="16"
+                                        Text="●" />
+
+                                    <StackPanel Grid.Column="1" Spacing="1">
+                                        <TextBlock
+                                            FontSize="16"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding DisplayName}" />
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="{Binding ContainerName}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        Spacing="1">
+                                        <TextBlock
+                                            HorizontalAlignment="Right"
+                                            FontSize="12"
+                                            FontWeight="SemiBold"
+                                            Foreground="{Binding StatusBrush}"
+                                            Text="{Binding StatusText}" />
+                                        <TextBlock
+                                            HorizontalAlignment="Right"
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="{Binding UsersText}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="1.2*,1*,1*" ColumnSpacing="12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="DOCKER IMAGE" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding ImageText}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="ПОРТЫ" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding PortsText}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Spacing="4">
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="СТАТУС DOCKER" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding DockerStatusText}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    HorizontalAlignment="Right">
+                                    <Button
+                                        Width="92"
+                                        Height="34"
+                                        Padding="12,0"
+                                        IsEnabled="{Binding CanStart}"
+                                        Click="StartProtocol_Click"
+                                        Content="Start" />
+
+                                    <Button
+                                        Width="92"
+                                        Height="34"
+                                        Padding="12,0"
+                                        IsEnabled="{Binding CanStop}"
+                                        Click="StopProtocol_Click"
+                                        Content="Stop" />
+
+                                    <Button
+                                        Width="92"
+                                        Height="34"
+                                        Padding="12,0"
+                                        Background="{DynamicResource AccentBrush}"
+                                        Foreground="White"
+                                        FontWeight="SemiBold"
+                                        IsEnabled="{Binding CanRestart}"
+                                        Click="RestartProtocol_Click"
+                                        Content="Restart" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

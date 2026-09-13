@@ -1,0 +1,84 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.CreateClientWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    Title="Новый клиент"
+    Width="430"
+    Height="320"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <StackPanel Spacing="4">
+            <TextBlock FontSize="22" FontWeight="SemiBold" Text="Новый VPN-клиент" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,22,0,0" Spacing="14">
+            <StackPanel Spacing="5">
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="Имя клиента" />
+                <TextBox
+                    x:Name="ClientNameBox"
+                    Height="38"
+                    VerticalContentAlignment="Center"
+                    PlaceholderText="Например: Ноутбук"
+                    MaxLength="100" />
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Text="Протокол" />
+                <ComboBox
+                    x:Name="ProtocolBox"
+                    Height="38"
+                    VerticalContentAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ProtocolStatusViewModel">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="{Binding DisplayName}" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="12,0,0,0"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextMutedBrush}"
+                                    Text="{Binding ContainerName}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+
+            <TextBlock
+                x:Name="ValidationText"
+                MinHeight="18"
+                FontSize="12"
+                Foreground="{DynamicResource StatusErrorBrush}"
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <Button
+                Grid.Column="1"
+                Width="90"
+                Height="36"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="CancelButton_Click"
+                Content="Отмена" />
+
+            <Button
+                Grid.Column="2"
+                Width="110"
+                Height="36"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="CreateButton_Click"
+                Content="Создать" />
+        </Grid>
+    </Grid>
+</Window>

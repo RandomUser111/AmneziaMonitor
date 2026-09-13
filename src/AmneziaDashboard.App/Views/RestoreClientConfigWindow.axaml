@@ -1,0 +1,86 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.RestoreClientConfigWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Восстановить конфигурацию"
+    Width="500"
+    Height="390"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <StackPanel Spacing="5">
+            <TextBlock
+                FontSize="22"
+                FontWeight="SemiBold"
+                Text="Восстановить конфигурацию?" />
+
+            <TextBlock
+                FontSize="12"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                TextWrapping="Wrap"
+                Text="Исходный PrivateKey клиента не хранится на VPN-сервере, поэтому старый .conf невозможно восстановить буквально." />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="12">
+            <Border
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="7">
+                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="Клиент" />
+                    <TextBlock x:Name="ClientNameText" Grid.Column="1" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+
+                    <TextBlock Grid.Row="1" Foreground="{DynamicResource TextSecondaryBrush}" Text="Протокол" />
+                    <TextBlock x:Name="ProtocolText" Grid.Row="1" Grid.Column="1" />
+
+                    <TextBlock Grid.Row="2" Foreground="{DynamicResource TextSecondaryBrush}" Text="VPN IP" />
+                    <TextBlock x:Name="AddressText" Grid.Row="2" Grid.Column="1" TextTrimming="CharacterEllipsis" />
+                </Grid>
+            </Border>
+
+            <Border
+                Padding="12"
+                Background="{DynamicResource SurfaceAltBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <StackPanel Spacing="5">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource StatusWarningBrush}"
+                        Text="Будет перевыпущена только ключевая пара клиента" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        TextWrapping="Wrap"
+                        Text="Имя и VPN IP сохранятся. Серверная запись останется тем же клиентом. Старый конфиг перестанет работать, а Amnezia Monitor покажет новый .conf и QR-код. Перед изменением будут созданы резервные копии." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Margin="0,20,0,0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <Button
+                Grid.Column="1"
+                Width="90"
+                Height="36"
+                Click="CancelButton_Click"
+                Content="Отмена" />
+
+            <Button
+                Grid.Column="2"
+                Width="170"
+                Height="36"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                Click="RestoreButton_Click"
+                Content="Восстановить конфиг" />
+        </Grid>
+    </Grid>
+</Window>

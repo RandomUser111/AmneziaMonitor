@@ -1,0 +1,172 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.LogsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    xmlns:svc="using:AmneziaDashboard.App.Services"
+    x:DataType="vm:LogsViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+        <StackPanel Spacing="2">
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="Журнал" />
+            <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding ServerText}" />
+        </StackPanel>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="События">
+                <Grid Margin="0,12,0,0" RowDefinitions="Auto,*" RowSpacing="10">
+                    <Border
+                        Padding="10"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderSoftBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <Grid ColumnDefinitions="*,170,Auto" ColumnSpacing="8">
+                            <TextBox
+                                Height="36"
+                                VerticalContentAlignment="Center"
+                                PlaceholderText="Поиск по журналу"
+                                Text="{Binding SearchText}" />
+                            <ComboBox
+                                Grid.Column="1"
+                                Height="36"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding Categories}"
+                                SelectedIndex="{Binding CategoryFilterIndex}" />
+                            <Button
+                                Grid.Column="2"
+                                Height="36"
+                                Padding="14,0"
+                                Click="ClearEvents_Click"
+                                Content="Очистить" />
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderSoftBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        ClipToBounds="True">
+
+                        <Grid>
+                            <StackPanel
+                                IsVisible="{Binding HasNoEvents}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="5">
+                                <TextBlock HorizontalAlignment="Center" FontSize="15" FontWeight="SemiBold" Text="Журнал пока пуст" />
+                                <TextBlock HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Text="События подключения, клиентов и Docker появятся здесь." />
+                            </StackPanel>
+
+                            <Grid IsVisible="{Binding HasEvents}" RowDefinitions="40,*">
+                                <Border
+                                    Padding="12,0"
+                                    Background="{DynamicResource SurfaceAltBrush}"
+                                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                                    BorderThickness="0,0,0,1">
+                                    <Grid ColumnDefinitions="145,85,100,*" ColumnSpacing="10">
+                                        <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Время" />
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Уровень" />
+                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Категория" />
+                                        <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Событие" />
+                                    </Grid>
+                                </Border>
+
+                                <ScrollViewer Grid.Row="1">
+                                    <ItemsControl ItemsSource="{Binding FilteredEvents}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="svc:AppLogEntry">
+                                                <Border Padding="12,9" BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,0,1">
+                                                    <Grid ColumnDefinitions="145,85,100,*" ColumnSpacing="10">
+                                                        <TextBlock VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding TimeText}" />
+                                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{Binding LevelBrush}" Text="{Binding Level}" />
+                                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Category}" />
+                                                        <TextBlock Grid.Column="3" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="{Binding Message}" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Docker logs">
+                <Grid Margin="0,12,0,0" RowDefinitions="Auto,*" RowSpacing="10">
+                    <Border
+                        Padding="10"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderSoftBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <Grid ColumnDefinitions="280,130,Auto,*" ColumnSpacing="8">
+                            <ComboBox
+                                Height="36"
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding Containers}"
+                                SelectedItem="{Binding SelectedContainer}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ProtocolStatusViewModel">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}" />
+                                            <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding ContainerName}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <NumericUpDown
+                                Grid.Column="1"
+                                Height="36"
+                                Minimum="20"
+                                Maximum="2000"
+                                Increment="100"
+                                Value="{Binding TailLines}" />
+
+                            <Button
+                                Grid.Column="2"
+                                Height="36"
+                                Padding="16,0"
+                                IsEnabled="{Binding CanReadDockerLogs}"
+                                Click="RefreshDockerLogs_Click"
+                                Content="Обновить" />
+
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="11"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="{Binding DockerStatus}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </Border>
+
+                    <Border
+                        Grid.Row="1"
+                        Padding="10"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderSoftBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <TextBox
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            FontFamily="Consolas,Menlo,monospace"
+                            FontSize="11"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            TextWrapping="NoWrap"
+                            Text="{Binding DockerLogs}" />
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

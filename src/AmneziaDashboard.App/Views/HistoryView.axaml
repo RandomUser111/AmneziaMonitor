@@ -1,0 +1,222 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.HistoryView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    xmlns:controls="using:AmneziaDashboard.App.Controls"
+    x:DataType="vm:HistoryViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <StackPanel Spacing="2">
+                    <TextBlock
+                        FontSize="28"
+                        FontWeight="SemiBold"
+                        Text="История" />
+                    <TextBlock
+                        FontSize="13"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding ServerTitle}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Spacing="6">
+                    <Button Width="58" Height="34" Click="HourButton_Click" Content="1 ч" />
+                    <Button Width="58" Height="34" Click="SixHoursButton_Click" Content="6 ч" />
+                    <Button Width="62" Height="34" Click="DayButton_Click" Content="24 ч" />
+                    <Button Width="68" Height="34" Click="WeekButton_Click" Content="7 дней" />
+                    <Button Width="94" Height="34" Click="RefreshButton_Click" Content="Обновить" />
+                </StackPanel>
+            </Grid>
+
+            <Border
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Text="{Binding PeriodText}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{Binding SampleSummary}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <ProgressBar
+                            Width="70"
+                            Height="4"
+                            IsVisible="{Binding IsLoading}"
+                            IsIndeterminate="{Binding IsLoading}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{DynamicResource TextMutedBrush}"
+                            Text="{Binding StatusText}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border
+                IsVisible="{Binding HasNoData}"
+                Padding="24"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Text="Пока нет данных для графиков" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Amnezia Monitor сохраняет одну точку мониторинга примерно раз в 30 секунд."
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Grid
+                IsVisible="{Binding HasData}"
+                ColumnDefinitions="*,*"
+                RowDefinitions="Auto,Auto"
+                ColumnSpacing="14"
+                RowSpacing="14">
+
+                <!-- CPU / RAM -->
+                <Border
+                    Padding="14"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="CPU / RAM" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Загрузка сервера" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
+                                <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource AccentBrush}" Text="CPU" />
+                                <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource StatusOnlineBrush}" Text="RAM" />
+                            </StackPanel>
+                        </Grid>
+
+                        <controls:HistoryChart
+                            Height="150"
+                            Values="{Binding CpuValues}"
+                            SecondaryValues="{Binding RamValues}"
+                            MaxValue="100"
+                            ValueFormat="Percent"
+                            LineBrush="{DynamicResource AccentBrush}"
+                            SecondaryLineBrush="{DynamicResource StatusOnlineBrush}"
+                            GridBrush="{DynamicResource BorderSoftBrush}"
+                            LabelBrush="{DynamicResource TextPrimaryBrush}"
+                            LabelBackgroundBrush="{DynamicResource SurfaceBrush}" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="CPU" />
+                                <TextBlock FontSize="12" Text="{Binding CpuSummary}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="RAM" />
+                                <TextBlock FontSize="12" Text="{Binding RamSummary}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Network -->
+                <Border
+                    Grid.Column="1"
+                    Padding="14"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="Сеть" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Скорость внешнего интерфейса" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
+                                <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource AccentBrush}" Text="↓ Download" />
+                                <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource StatusWarningBrush}" Text="↑ Upload" />
+                            </StackPanel>
+                        </Grid>
+
+                        <controls:HistoryChart
+                            Height="150"
+                            Values="{Binding DownloadValues}"
+                            SecondaryValues="{Binding UploadValues}"
+                            ValueFormat="Rate"
+                            LineBrush="{DynamicResource AccentBrush}"
+                            SecondaryLineBrush="{DynamicResource StatusWarningBrush}"
+                            GridBrush="{DynamicResource BorderSoftBrush}"
+                            LabelBrush="{DynamicResource TextPrimaryBrush}"
+                            LabelBackgroundBrush="{DynamicResource SurfaceBrush}" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="DOWNLOAD" />
+                                <TextBlock FontSize="12" Text="{Binding DownloadSummary}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock FontSize="10" Foreground="{DynamicResource TextMutedBrush}" Text="UPLOAD" />
+                                <TextBlock FontSize="12" Text="{Binding UploadSummary}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Clients -->
+                <Border
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Padding="14"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="2">
+                                <TextBlock FontSize="14" FontWeight="SemiBold" Text="VPN-клиенты онлайн" />
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Text="Количество активных WireGuard / AmneziaWG клиентов" />
+                            </StackPanel>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="{Binding ClientsSummary}" />
+                        </Grid>
+
+                        <controls:HistoryChart
+                            Height="135"
+                            Values="{Binding ClientsValues}"
+                            ValueFormat="Integer"
+                            LineBrush="{DynamicResource StatusOnlineBrush}"
+                            GridBrush="{DynamicResource BorderSoftBrush}"
+                            LabelBrush="{DynamicResource TextPrimaryBrush}"
+                            LabelBackgroundBrush="{DynamicResource SurfaceBrush}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

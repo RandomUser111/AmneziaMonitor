@@ -1,0 +1,183 @@
+<Application
+    x:Class="AmneziaDashboard.App.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AmneziaDashboard.App"
+    RequestedThemeVariant="Light">
+
+    <!--
+        Автоматическое сопоставление:
+        DashboardViewModel -> DashboardView
+        ClientsViewModel   -> ClientsView
+        и т.д.
+    -->
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <ResourceDictionary.ThemeDictionaries>
+
+                <!-- LIGHT -->
+                <ResourceDictionary x:Key="Light">
+
+                    <SolidColorBrush
+                        x:Key="AppBackgroundBrush"
+                        Color="#F3F5F7" />
+
+                    <SolidColorBrush
+                        x:Key="SurfaceBrush"
+                        Color="#FFFFFF" />
+
+                    <SolidColorBrush
+                        x:Key="SurfaceAltBrush"
+                        Color="#F8FAFC" />
+
+                    <SolidColorBrush
+                        x:Key="BorderSoftBrush"
+                        Color="#E2E8F0" />
+
+                    <SolidColorBrush
+                        x:Key="TextPrimaryBrush"
+                        Color="#0F172A" />
+
+                    <SolidColorBrush
+                        x:Key="TextSecondaryBrush"
+                        Color="#64748B" />
+
+                    <SolidColorBrush
+                        x:Key="TextMutedBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="AccentBrush"
+                        Color="#2563EB" />
+
+                    <SolidColorBrush
+                        x:Key="AccentHoverBrush"
+                        Color="#1D4ED8" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarBackgroundBrush"
+                        Color="#0B1730" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarHoverBrush"
+                        Color="#162544" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarTextBrush"
+                        Color="#E2E8F0" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarMutedBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="StatusOnlineBrush"
+                        Color="#22C55E" />
+
+                    <SolidColorBrush
+                        x:Key="StatusOfflineBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="StatusWarningBrush"
+                        Color="#F59E0B" />
+
+                    <SolidColorBrush
+                        x:Key="StatusErrorBrush"
+                        Color="#EF4444" />
+
+                </ResourceDictionary>
+
+                <!-- DARK -->
+                <ResourceDictionary x:Key="Dark">
+
+                    <SolidColorBrush
+                        x:Key="AppBackgroundBrush"
+                        Color="#0F172A" />
+
+                    <SolidColorBrush
+                        x:Key="SurfaceBrush"
+                        Color="#111827" />
+
+                    <SolidColorBrush
+                        x:Key="SurfaceAltBrush"
+                        Color="#1F2937" />
+
+                    <SolidColorBrush
+                        x:Key="BorderSoftBrush"
+                        Color="#334155" />
+
+                    <SolidColorBrush
+                        x:Key="TextPrimaryBrush"
+                        Color="#F8FAFC" />
+
+                    <SolidColorBrush
+                        x:Key="TextSecondaryBrush"
+                        Color="#CBD5E1" />
+
+                    <SolidColorBrush
+                        x:Key="TextMutedBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="AccentBrush"
+                        Color="#3B82F6" />
+
+                    <SolidColorBrush
+                        x:Key="AccentHoverBrush"
+                        Color="#2563EB" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarBackgroundBrush"
+                        Color="#020617" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarHoverBrush"
+                        Color="#172033" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarTextBrush"
+                        Color="#E2E8F0" />
+
+                    <SolidColorBrush
+                        x:Key="SidebarMutedBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="StatusOnlineBrush"
+                        Color="#22C55E" />
+
+                    <SolidColorBrush
+                        x:Key="StatusOfflineBrush"
+                        Color="#94A3B8" />
+
+                    <SolidColorBrush
+                        x:Key="StatusWarningBrush"
+                        Color="#F59E0B" />
+
+                    <SolidColorBrush
+                        x:Key="StatusErrorBrush"
+                        Color="#EF4444" />
+
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

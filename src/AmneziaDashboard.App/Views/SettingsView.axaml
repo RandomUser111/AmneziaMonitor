@@ -1,0 +1,94 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.SettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:SettingsViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+
+            <StackPanel Spacing="2">
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="SemiBold"
+                    Text="Настройки" />
+
+                <TextBlock
+                    FontSize="13"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="Параметры Amnezia Monitor" />
+            </StackPanel>
+
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="Тема оформления" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="Переключение применяется сразу ко всему приложению." />
+                        </StackPanel>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{Binding CurrentTheme}" />
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            Command="{Binding SetLightThemeCommand}"
+                            Content="Светлая" />
+
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            Command="{Binding SetDarkThemeCommand}"
+                            Content="Тёмная" />
+
+                        <Button
+                            Height="36"
+                            Padding="14,0"
+                            Command="{Binding SetSystemThemeCommand}"
+                            Content="Как в системе" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel Spacing="4">
+                    <TextBlock
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Text="Хранение настроек" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Профили серверов сохраняются локально. SSH-пароли хранятся только в системном защищённом хранилище: Windows Credential Manager или Linux Secret Service."
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

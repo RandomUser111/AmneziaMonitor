@@ -1,0 +1,100 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.ClientConfigWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Конфигурация клиента"
+    Width="760"
+    Height="720"
+    MinWidth="620"
+    MinHeight="560"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+        <StackPanel Spacing="3">
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="SemiBold" Text="Клиент создан" />
+            <TextBlock
+                x:Name="AddressText"
+                FontSize="12"
+                Foreground="{DynamicResource TextSecondaryBrush}" />
+        </StackPanel>
+
+        <Border
+            Grid.Row="1"
+            Padding="10"
+            Background="{DynamicResource SurfaceAltBrush}"
+            BorderBrush="{DynamicResource BorderSoftBrush}"
+            BorderThickness="1"
+            CornerRadius="7">
+            <TextBlock
+                FontSize="12"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                TextWrapping="Wrap"
+                Text="Сохраните профиль сейчас. Он содержит приватный ключ нового клиента, который Amnezia Monitor намеренно не сохраняет локально." />
+        </Border>
+
+        <Border
+            x:Name="QrPanel"
+            Grid.Row="2"
+            Padding="14"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderSoftBrush}"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Grid ColumnDefinitions="220,*" ColumnSpacing="16">
+                <Border
+                    Width="220"
+                    Height="220"
+                    Padding="8"
+                    Background="White"
+                    CornerRadius="8"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top">
+                    <Image
+                        x:Name="QrImage"
+                        Width="204"
+                        Height="204"
+                        Stretch="Uniform" />
+                </Border>
+
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <TextBlock FontSize="16" FontWeight="SemiBold" Text="QR-код для телефона" />
+                    <TextBlock
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        TextWrapping="Wrap"
+                        Text="Сканируйте код в приложении WireGuard или совместимом клиенте Amnezia VPN. В QR-код встроен полный .conf-профиль нового клиента." />
+                    <TextBlock
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        TextWrapping="Wrap"
+                        Text="Если сканирование недоступно, ниже можно скопировать или сохранить конфигурацию в файл." />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TextBox
+            x:Name="ConfigBox"
+            Grid.Row="3"
+            AcceptsReturn="True"
+            IsReadOnly="True"
+            FontFamily="Consolas,Menlo,monospace"
+            FontSize="12"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            TextWrapping="NoWrap" />
+
+        <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+            <Button Width="110" Height="36" Click="CopyButton_Click" Content="Копировать" />
+            <Button Grid.Column="1" Width="125" Height="36" Click="SaveButton_Click" Content="Сохранить .conf" />
+            <TextBlock
+                x:Name="StatusText"
+                Grid.Column="2"
+                Margin="8,0"
+                VerticalAlignment="Center"
+                FontSize="11"
+                Foreground="{DynamicResource TextSecondaryBrush}" />
+            <Button Grid.Column="3" Width="86" Height="36" Click="CloseButton_Click" Content="Готово" />
+        </Grid>
+    </Grid>
+</Window>

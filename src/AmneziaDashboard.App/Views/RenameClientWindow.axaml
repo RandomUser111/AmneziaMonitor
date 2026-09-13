@@ -1,0 +1,62 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.RenameClientWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Переименовать клиента"
+    Width="420"
+    Height="220"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <StackPanel Spacing="4">
+            <TextBlock
+                FontSize="21"
+                FontWeight="SemiBold"
+                Text="Переименовать клиента" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,20,0,0" Spacing="6">
+            <TextBlock
+                FontSize="12"
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                Text="Новое имя" />
+            <TextBox
+                x:Name="NameTextBox"
+                Height="38"
+                MaxLength="100"
+                VerticalContentAlignment="Center" />
+            <TextBlock
+                x:Name="ErrorTextBlock"
+                MinHeight="18"
+                FontSize="11"
+                Foreground="{DynamicResource StatusErrorBrush}"
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <Button
+                Grid.Column="1"
+                Width="90"
+                Height="36"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="CancelButton_Click"
+                Content="Отмена" />
+            <Button
+                Grid.Column="2"
+                Width="110"
+                Height="36"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="SaveButton_Click"
+                Content="Сохранить" />
+        </Grid>
+    </Grid>
+</Window>

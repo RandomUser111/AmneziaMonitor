@@ -1,0 +1,222 @@
+<Window
+    x:Class="AmneziaDashboard.App.Views.ConnectServerWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    xmlns:core="using:AmneziaDashboard.Core.Models"
+    x:DataType="vm:ConnectServerViewModel"
+    Title="Подключение к серверу"
+    Width="470"
+    Height="690"
+    CanResize="False"
+    WindowStartupLocation="CenterOwner"
+    Icon="avares://AmneziaMonitor/Assets/amnezia-monitor-icon.ico"
+    Background="{DynamicResource AppBackgroundBrush}"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid
+        Margin="22"
+        RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <StackPanel Spacing="4">
+            <TextBlock
+                FontSize="22"
+                FontWeight="SemiBold"
+                Text="{Binding HeaderText}" />
+
+            <TextBlock
+                Foreground="{DynamicResource TextSecondaryBrush}"
+                FontSize="13"
+                Text="{Binding DescriptionText}" />
+        </StackPanel>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" Margin="0,22,0,0">
+            <StackPanel Spacing="14">
+
+                <Border
+                    IsVisible="{Binding ShowSavedProfiles}"
+                    Padding="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+
+                    <StackPanel Spacing="7">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="Сохранённые серверы" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <ComboBox
+                                Height="38"
+                                ItemsSource="{Binding SavedProfiles}"
+                                SelectedItem="{Binding SelectedProfile}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="core:ServerProfile">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding Name}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource TextMutedBrush}"
+                                                Text="{Binding Host}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <Button
+                                Grid.Column="1"
+                                Width="82"
+                                Height="38"
+                                IsEnabled="{Binding CanDeleteProfile}"
+                                Click="DeleteProfileButton_Click"
+                                Content="Удалить" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Spacing="5">
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Название" />
+
+                    <TextBox
+                        Height="38"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding Name}" />
+                </StackPanel>
+
+                <StackPanel Spacing="5">
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="IP-адрес или имя сервера" />
+
+                    <TextBox
+                        Height="38"
+                        VerticalContentAlignment="Center"
+                        PlaceholderText="185.123.45.67"
+                        Text="{Binding Host}" />
+                </StackPanel>
+
+                <Grid ColumnDefinitions="*,110" ColumnSpacing="10">
+
+                    <StackPanel Spacing="5">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="Пользователь" />
+
+                        <TextBox
+                            Height="38"
+                            VerticalContentAlignment="Center"
+                            Text="{Binding Username}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Spacing="5">
+
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="SSH-порт" />
+
+                        <NumericUpDown
+                            Height="38"
+                            Minimum="1"
+                            Maximum="65535"
+                            Value="{Binding Port}" />
+                    </StackPanel>
+
+                </Grid>
+
+                <StackPanel Spacing="5">
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Пароль" />
+
+                    <TextBox
+                        Height="38"
+                        VerticalContentAlignment="Center"
+                        PasswordChar="●"
+                        Text="{Binding Password}" />
+                </StackPanel>
+
+                <CheckBox
+                    IsVisible="{Binding ShowSaveProfileOption}"
+                    IsChecked="{Binding SaveProfile}"
+                    Content="Сохранить параметры сервера" />
+
+                <CheckBox
+                    IsEnabled="{Binding SecureStorageAvailable}"
+                    IsChecked="{Binding RememberPassword}"
+                    Content="Сохранить SSH-пароль безопасно" />
+
+                <TextBlock
+                    Margin="24,-8,0,0"
+                    FontSize="11"
+                    Foreground="{DynamicResource TextMutedBrush}"
+                    Text="{Binding SecureStorageText}"
+                    TextWrapping="Wrap" />
+
+                <CheckBox
+                    IsEnabled="{Binding RememberPassword}"
+                    IsChecked="{Binding AutoConnect}"
+                    Content="Подключаться к этому серверу автоматически при запуске" />
+
+                <TextBlock
+                    MinHeight="20"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding StatusMessage}" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <Grid
+            Grid.Row="2"
+            Margin="0,18,0,0"
+            ColumnDefinitions="*,Auto,Auto"
+            ColumnSpacing="8">
+
+            <ProgressBar
+                Width="80"
+                Height="4"
+                VerticalAlignment="Center"
+                IsVisible="{Binding IsConnecting}"
+                IsIndeterminate="{Binding IsConnecting}" />
+
+            <Button
+                Grid.Column="1"
+                Width="90"
+                Height="36"
+                Click="CancelButton_Click"
+                Content="Отмена" />
+
+            <Button
+                Grid.Column="2"
+                Width="170"
+                Height="36"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                Click="ConnectButton_Click"
+                Content="{Binding PrimaryButtonText}" />
+
+        </Grid>
+
+    </Grid>
+</Window>

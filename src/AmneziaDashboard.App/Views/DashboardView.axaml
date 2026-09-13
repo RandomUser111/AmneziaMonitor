@@ -1,0 +1,389 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.DashboardView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:DashboardViewModel"
+    mc:Ignorable="d"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+
+            <!-- Header -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                    <TextBlock
+                        FontSize="28"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="Обзор" />
+
+                    <TextBlock
+                        FontSize="13"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Состояние VPN-сервера" />
+                </StackPanel>
+
+                <Button
+                    Grid.Column="1"
+                    Classes="ActionButton"
+                    VerticalAlignment="Center"
+                    Click="ConnectServer_Click"
+                    Content="{Binding ConnectButtonText}" />
+            </Grid>
+
+            <!-- Server card -->
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+
+                <StackPanel Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Text="СЕРВЕР" />
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
+
+                            <Ellipse
+                                Width="8"
+                                Height="8"
+                                Fill="{Binding ServerStatusBrush}" />
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="{Binding ServerStatus}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+
+                        <Border
+                            Grid.Column="0"
+                            Padding="12"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            CornerRadius="8">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="CPU" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding CpuUsage}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                            Grid.Column="1"
+                            Padding="12"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            CornerRadius="8">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="RAM" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding RamUsage}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                            Grid.Column="2"
+                            Padding="12"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            CornerRadius="8">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Диск" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding DiskUsage}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                            Grid.Column="3"
+                            Padding="12"
+                            Background="{DynamicResource SurfaceAltBrush}"
+                            CornerRadius="8">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Uptime" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding Uptime}" />
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="14">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="Сеть:" />
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="↓" />
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                Text="{Binding DownloadSpeed}" />
+
+                            <TextBlock
+                                Margin="6,0,0,0"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Text="↑" />
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                Text="{Binding UploadSpeed}" />
+                        </StackPanel>
+
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            FontSize="11"
+                            Foreground="{DynamicResource TextMutedBrush}"
+                            Text="{Binding MonitorStatus}" />
+
+                        <TextBlock
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            FontSize="13"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{Binding ServerAddress}" />
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <!-- VPN containers -->
+            <Border
+                Padding="16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+
+                <StackPanel Spacing="10">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Text="VPN" />
+
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="Контейнеры Amnezia" />
+                    </Grid>
+
+                    <Border
+                        IsVisible="{Binding HasNoProtocols}"
+                        Padding="12,11"
+                        Background="{DynamicResource SurfaceAltBrush}"
+                        CornerRadius="8">
+                        <TextBlock
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            Text="{Binding ProtocolsMessage}"
+                            TextWrapping="Wrap" />
+                    </Border>
+
+                    <ItemsControl
+                        IsVisible="{Binding HasProtocols}"
+                        ItemsSource="{Binding Protocols}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ProtocolStatusViewModel">
+                                <Border
+                                    Margin="0,0,0,7"
+                                    Padding="12,10"
+                                    Background="{DynamicResource SurfaceAltBrush}"
+                                    CornerRadius="8">
+                                    <Grid ColumnDefinitions="18,*,145,100" ColumnSpacing="8">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Foreground="{Binding StatusBrush}"
+                                            FontSize="14"
+                                            Text="●" />
+
+                                        <StackPanel
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Spacing="1">
+                                            <TextBlock
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                                Text="{Binding DisplayName}" />
+                                            <TextBlock
+                                                FontSize="10"
+                                                Foreground="{DynamicResource TextMutedBrush}"
+                                                Text="{Binding ContainerName}" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Text="{Binding UsersText}" />
+
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{Binding StatusBrush}"
+                                            Text="{Binding StatusText}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom cards -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+
+                <Border
+                    Grid.Column="0"
+                    Padding="16"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+
+                    <StackPanel Spacing="12">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Text="КЛИЕНТЫ" />
+
+                        <Grid ColumnDefinitions="*,*">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Онлайн" />
+                                <TextBlock
+                                    FontSize="22"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding ClientsOnline}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Всего" />
+                                <TextBlock
+                                    FontSize="22"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding ClientsTotal}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Grid.Column="1"
+                    Padding="16"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10">
+
+                    <StackPanel Spacing="12">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            Text="ТРАФИК" />
+
+                        <Grid ColumnDefinitions="*,*">
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Получено" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding TrafficReceived}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Text="Отправлено" />
+                                <TextBlock
+                                    FontSize="20"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextPrimaryBrush}"
+                                    Text="{Binding TrafficSent}" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

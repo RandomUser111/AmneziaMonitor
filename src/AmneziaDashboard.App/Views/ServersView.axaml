@@ -1,0 +1,235 @@
+<UserControl
+    x:Class="AmneziaDashboard.App.Views.ServersView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:AmneziaDashboard.App.ViewModels"
+    x:DataType="vm:ServersViewModel"
+    Foreground="{DynamicResource TextPrimaryBrush}">
+
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+        <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="2">
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="SemiBold"
+                    Text="Серверы" />
+
+                <TextBlock
+                    FontSize="13"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="Сохранённые Amnezia VPN серверы и быстрое переключение между ними" />
+            </StackPanel>
+
+            <Button
+                Grid.Column="1"
+                Width="145"
+                Height="36"
+                Background="{DynamicResource AccentBrush}"
+                Foreground="White"
+                FontWeight="SemiBold"
+                Click="AddServer_Click"
+                Content="+ Добавить сервер" />
+        </Grid>
+
+        <Border
+            Grid.Row="1"
+            IsVisible="{Binding HasServers}"
+            Padding="11,8"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderSoftBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    Text="Текущий сервер:" />
+                <TextBlock
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    FontWeight="SemiBold"
+                    Text="{Binding CurrentServerName}" />
+                <TextBlock
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontSize="11"
+                    Foreground="{DynamicResource TextMutedBrush}"
+                    Text="Также можно переключаться из верхней панели" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Border
+                IsVisible="{Binding HasNoServers}"
+                Padding="24"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="8">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="17"
+                        FontWeight="SemiBold"
+                        Text="Сохранённых серверов пока нет" />
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="Добавьте первый VPS, чтобы он появился в списке быстрого переключения." />
+                    <Button
+                        Margin="0,8,0,0"
+                        Width="145"
+                        Height="36"
+                        Background="{DynamicResource AccentBrush}"
+                        Foreground="White"
+                        Click="AddServer_Click"
+                        Content="Добавить сервер" />
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer IsVisible="{Binding HasServers}">
+                <StackPanel Spacing="10">
+                    <Border
+                        IsVisible="{Binding HasStatusMessage}"
+                        Padding="10"
+                        Background="{DynamicResource SurfaceAltBrush}"
+                        CornerRadius="8">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            TextWrapping="Wrap"
+                            Text="{Binding StatusMessage}" />
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding Servers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ServerProfileItemViewModel">
+                                <Border
+                                    Margin="0,0,0,10"
+                                    Padding="16"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderSoftBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10">
+
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="12" ColumnSpacing="16">
+                                        <StackPanel Spacing="4">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Ellipse
+                                                    Width="9"
+                                                    Height="9"
+                                                    VerticalAlignment="Center"
+                                                    Fill="{Binding StatusBrush}" />
+                                                <TextBlock
+                                                    FontSize="17"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding Name}" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="11"
+                                                    Foreground="{Binding StatusBrush}"
+                                                    Text="{Binding StatusText}" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Spacing="14">
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                                    Text="{Binding AddressText}" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                                    Text="{Binding Username}" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel
+                                            Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            Spacing="8">
+                                            <Button
+                                                Width="112"
+                                                Height="34"
+                                                IsEnabled="{Binding CanConnect}"
+                                                Click="ConnectServer_Click"
+                                                Content="Подключиться" />
+                                            <Button
+                                                Width="82"
+                                                Height="34"
+                                                Click="EditServer_Click"
+                                                Content="Изменить" />
+                                            <Button
+                                                Width="76"
+                                                Height="34"
+                                                Foreground="{DynamicResource StatusErrorBrush}"
+                                                Click="DeleteServer_Click"
+                                                Content="Удалить" />
+                                        </StackPanel>
+
+                                        <Grid
+                                            Grid.Row="1"
+                                            Grid.ColumnSpan="2"
+                                            ColumnDefinitions="1*,1*,1*"
+                                            ColumnSpacing="12">
+                                            <Border
+                                                Padding="10"
+                                                Background="{DynamicResource SurfaceAltBrush}"
+                                                CornerRadius="7">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock
+                                                        FontSize="10"
+                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                        Text="SSH" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Text="{Binding UserText}" />
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border
+                                                Grid.Column="1"
+                                                Padding="10"
+                                                Background="{DynamicResource SurfaceAltBrush}"
+                                                CornerRadius="7">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock
+                                                        FontSize="10"
+                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                        Text="УЧЁТНЫЕ ДАННЫЕ" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Text="{Binding PasswordStatusText}" />
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border
+                                                Grid.Column="2"
+                                                Padding="10"
+                                                Background="{DynamicResource SurfaceAltBrush}"
+                                                CornerRadius="7">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock
+                                                        FontSize="10"
+                                                        Foreground="{DynamicResource TextMutedBrush}"
+                                                        Text="ЗАПУСК" />
+                                                    <TextBlock
+                                                        FontSize="12"
+                                                        Text="{Binding AutoConnectText}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

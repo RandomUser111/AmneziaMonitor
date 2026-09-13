@@ -121,7 +121,7 @@ jobs:
           path: AmneziaMonitor-v${{ env.VERSION }}-${{ matrix.rid }}.${{ matrix.ext }}
           if-no-files-found: error
 
-  github-release:
+   github-release:
     if: github.ref_type == 'tag'
     needs: publish
     runs-on: ubuntu-latest
@@ -134,11 +134,12 @@ jobs:
           merge-multiple: true
 
       - name: Create GitHub Release
-  env:
-    GH_TOKEN: ${{ github.token }}
-  run: >
-    gh release create "${GITHUB_REF_NAME}"
-    release-assets/*
-    --repo "${GITHUB_REPOSITORY}"
-    --title "Amnezia Monitor ${GITHUB_REF_NAME}"
-    --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Amnezia Monitor $GITHUB_REF_NAME" \
+            --generate-notes

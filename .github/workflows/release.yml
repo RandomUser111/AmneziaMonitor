@@ -128,12 +128,17 @@ jobs:
 
     steps:
       - name: Download release assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: release-assets
           merge-multiple: true
 
       - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" release-assets/* --title "Amnezia Monitor ${GITHUB_REF_NAME}" --generate-notes
+  env:
+    GH_TOKEN: ${{ github.token }}
+  run: >
+    gh release create "${GITHUB_REF_NAME}"
+    release-assets/*
+    --repo "${GITHUB_REPOSITORY}"
+    --title "Amnezia Monitor ${GITHUB_REF_NAME}"
+    --generate-notes

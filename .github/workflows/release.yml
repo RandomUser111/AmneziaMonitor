@@ -4,12 +4,6 @@ on:
   push:
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version without v prefix, for example 1.0.2'
-        required: true
-        default: '1.0.2'
 
 permissions:
   contents: write
@@ -23,12 +17,15 @@ jobs:
           - os: windows-latest
             rid: win-x64
             ext: zip
+
           - os: windows-latest
             rid: win-arm64
             ext: zip
+
           - os: ubuntu-latest
             rid: linux-x64
             ext: tar.gz
+
           - os: ubuntu-latest
             rid: linux-arm64
             ext: tar.gz
@@ -47,11 +44,7 @@ jobs:
       - name: Resolve version
         shell: bash
         run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            VERSION="${{ inputs.version }}"
-          fi
+          VERSION="${GITHUB_REF_NAME#v}"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Restore runtime assets
@@ -78,7 +71,7 @@ jobs:
           cp LICENSE "publish/${{ matrix.rid }}/LICENSE"
           cp THIRD_PARTY_NOTICES.md "publish/${{ matrix.rid }}/THIRD_PARTY_NOTICES.md"
 
-      - name: Add runtime note (Windows)
+      - name: Add runtime note Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -86,33 +79,38 @@ jobs:
           Amnezia Monitor ${{ env.VERSION }}
           Platform: ${{ matrix.rid }}
 
-          Compact build. Requires .NET 10 Runtime:
+          Compact build.
+          Requires .NET 10 Runtime:
           https://dotnet.microsoft.com/download/dotnet/10.0
           "@ | Set-Content "publish/${{ matrix.rid }}/README-RUNTIME.txt" -Encoding UTF8
 
-      - name: Add runtime note (Linux)
+      - name: Add runtime note Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          cat > "publish/${{ matrix.rid }}/README-RUNTIME.txt" <<TXT
+          cat > "publish/${{ matrix.rid }}/README-RUNTIME.txt" <<EOF
           Amnezia Monitor ${{ env.VERSION }}
           Platform: ${{ matrix.rid }}
 
-          Compact build. Requires .NET 10 Runtime:
+          Compact build.
+          Requires .NET 10 Runtime:
           https://dotnet.microsoft.com/download/dotnet/10.0
-          TXT
+          EOF
 
       - name: Package Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Compress-Archive -Path "publish/${{ matrix.rid }}/*" -DestinationPath "AmneziaMonitor-v${{ env.VERSION }}-${{ matrix.rid }}.zip"
+          Compress-Archive `
+            -Path "publish/${{ matrix.rid }}/*" `
+            -DestinationPath "AmneziaMonitor-v${{ env.VERSION }}-${{ matrix.rid }}.zip"
 
       - name: Package Linux
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          tar -C "publish/${{ matrix.rid }}" -czf "AmneziaMonitor-v${VERSION}-${{ matrix.rid }}.tar.gz" .
+          tar -C "publish/${{ matrix.rid }}" \
+            -czf "AmneziaMonitor-v${VERSION}-${{ matrix.rid }}.tar.gz" .
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -121,8 +119,7 @@ jobs:
           path: AmneziaMonitor-v${{ env.VERSION }}-${{ matrix.rid }}.${{ matrix.ext }}
           if-no-files-found: error
 
-   github-release:
-    if: github.ref_type == 'tag'
+  github-release:
     needs: publish
     runs-on: ubuntu-latest
 

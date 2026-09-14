@@ -1,6 +1,6 @@
 # Amnezia Monitor
-![Platform](https://img.shields.io/badge/platrofm-windows)
-![Platform](https://img.shields.io/badge/platrofm-linux-blue)
+![Windows](https://img.shields.io/badge/platrofm-windows)
+![Linux](https://img.shields.io/badge/platrofm-linux-blue)
 <p align="center">
   <img width="1021" height="679" alt="изображение" src="https://github.com/user-attachments/assets/f7dca775-a406-46b7-bb05-b442022a682c" />
 </p>
